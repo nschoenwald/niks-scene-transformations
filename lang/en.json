@@ -1,0 +1,78 @@
+{
+  "niks-scene-transformations": {
+    "Tab": {
+      "Label": "Transform",
+      "Intro": "Rotate the scene or add playable space around it. Tokens, walls, doors, lights, sounds, tiles, drawings, notes and regions move along, so everything stays where it belongs on the map. Changes are saved right away."
+    },
+    "Mode": {
+      "Legend": "Transformation",
+      "Label": "Type",
+      "Pad": "Add space around the scene",
+      "Rotate": "Rotate the scene"
+    },
+    "Pad": {
+      "Legend": "Add Space",
+      "Linked": "Same on all sides",
+      "Amount": "Grid spaces",
+      "Top": "Top",
+      "Right": "Right",
+      "Bottom": "Bottom",
+      "Left": "Left",
+      "Hint": "The scene grows by this many grid spaces on each side. Unlike Foundry's padding, players can move into the new space. Background and foreground images become locked tiles, so the map stays where it is."
+    },
+    "Rotate": {
+      "Legend": "Rotate",
+      "Direction": "Direction",
+      "Clockwise": "90° clockwise",
+      "CounterClockwise": "90° counter-clockwise",
+      "Half": "180°",
+      "Hint": "On a quarter turn, background and foreground images become locked tiles turned with the map. A half turn keeps them as backgrounds."
+    },
+    "Preview": {
+      "Legend": "Preview"
+    },
+    "Size": {
+      "Current": "Current size",
+      "New": "New size",
+      "Value": "{width} × {height} px ({columns} × {rows} grid spaces)"
+    },
+    "Options": {
+      "Legend": "Options",
+      "Backup": "Keep a backup copy",
+      "BackupHint": "Saves an untouched copy of the scene first, hidden from the navigation bar.",
+      "ResetFog": "Reset fog exploration",
+      "ResetFogHint": "Explored areas no longer match the map after a transformation."
+    },
+    "Apply": "Apply Transformation",
+    "Confirm": {
+      "Title": "Transform Scene",
+      "Rotate": "Rotate this scene and everything on it?",
+      "Pad": "Add space around this scene and move everything on it?",
+      "Unsaved": "This saves immediately. Unsaved changes in other tabs of this window will be lost.",
+      "NoBackup": "<strong>No backup copy will be made.</strong>"
+    },
+    "Notify": {
+      "Success": "Transformed scene \"{name}\".",
+      "Backup": "Saved a backup copy as \"{name}\"."
+    },
+    "Backup": {
+      "Name": "{name} (Backup)"
+    },
+    "Tile": {
+      "background": "{level} Background",
+      "foreground": "{level} Foreground"
+    },
+    "Warning": {
+      "FogOverlay": "This scene has a fog overlay image. It isn't moved or rotated with the map.",
+      "UnknownShape": "A region shape of type \"{type}\" isn't supported and was left in place."
+    },
+    "Error": {
+      "InvalidAngle": "Scenes can only be rotated by 90, 180 or 270 degrees.",
+      "HexRotation": "Scenes with a hexagonal grid can't be rotated.",
+      "InvalidPadding": "Space must be given in whole grid spaces of 0 or more.",
+      "NoPadding": "Enter how many grid spaces to add on at least one side.",
+      "NotGM": "Only a Gamemaster can transform scenes.",
+      "Failed": "Transforming the scene failed: {error}"
+    }
+  }
+}

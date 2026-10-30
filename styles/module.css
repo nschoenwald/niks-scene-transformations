@@ -1,0 +1,103 @@
+/* Transform tab of Scene Configuration. Colors come from Foundry's theme variables, so they follow the Core Apps
+   light/dark setting. */
+.scene-config .nst-tab {
+  --nst-area-bg: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  --nst-area-border: var(--color-border);
+  --nst-map-bg: color-mix(in srgb, var(--color-text-primary) 22%, transparent);
+  --nst-map-border: var(--color-text-emphatic, var(--color-text-primary));
+  --nst-map-icon: var(--color-text-primary);
+}
+
+.scene-config .nst-tab [hidden] {
+  display: none !important;
+}
+
+.scene-config .nst-tab .nst-sides {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.scene-config .nst-tab .nst-sides label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--font-size-12);
+  color: var(--color-form-hint);
+}
+
+.scene-config .nst-tab .nst-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 236px;
+  padding: 8px 0;
+}
+
+.scene-config .nst-tab .nst-preview-area {
+  position: relative;
+  background: var(--nst-area-bg);
+  outline: 1px dashed var(--nst-area-border);
+  transition: width 150ms ease, height 150ms ease;
+}
+
+.scene-config .nst-tab .nst-preview-map {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4px;
+  background-color: var(--nst-map-bg);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border: 2px solid var(--nst-map-border);
+  transition: transform 200ms ease, left 150ms ease, top 150ms ease, width 150ms ease, height 150ms ease;
+}
+
+.scene-config .nst-tab .nst-preview-map i {
+  color: var(--nst-map-icon);
+  text-shadow: 0 0 3px var(--color-shadow-dark, #000);
+}
+
+.scene-config .nst-tab .nst-preview-map:not(.no-image) i {
+  color: #fff;
+}
+
+.scene-config .nst-tab .nst-size {
+  font-variant-numeric: tabular-nums;
+}
+
+.scene-config .nst-tab .nst-warning {
+  margin: 0 0 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-level-warning);
+  border-radius: 4px;
+  background: var(--color-level-warning-bg);
+  color: var(--color-text-primary);
+}
+
+.scene-config .nst-tab .nst-apply {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Core lays the tabs out in one row that never wraps. The window is widened for the Transform tab
+   (scene-config-tab.js); if it still gets too narrow (UI scale, tabs from other modules), labels shrink with an
+   ellipsis instead of overflowing the window. */
+.scene-config nav.tabs.sheet-tabs {
+  padding-inline: var(--spacer-8);
+}
+
+.scene-config nav.tabs.sheet-tabs > [data-tab] {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The scene form's Save button doesn't apply to this tab, which works with its own button */
+.scene-config:has(.nst-tab.active) .form-footer {
+  display: none;
+}

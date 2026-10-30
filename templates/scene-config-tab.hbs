@@ -1,0 +1,98 @@
+<div class="tab scrollable nst-tab{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <p class="hint">{{localize "niks-scene-transformations.Tab.Intro"}}</p>
+
+    <fieldset>
+        <legend>{{localize "niks-scene-transformations.Mode.Legend"}}</legend>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-mode">{{localize "niks-scene-transformations.Mode.Label"}}</label>
+            <div class="form-fields">
+                <select id="{{rootId}}-nst-mode" data-nst="mode">
+                    <option value="pad">{{localize "niks-scene-transformations.Mode.Pad"}}</option>
+                    <option value="rotate">{{localize "niks-scene-transformations.Mode.Rotate"}}</option>
+                </select>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset data-nst-section="pad">
+        <legend>{{localize "niks-scene-transformations.Pad.Legend"}}</legend>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-linked">{{localize "niks-scene-transformations.Pad.Linked"}}</label>
+            <div class="form-fields">
+                <input type="checkbox" id="{{rootId}}-nst-linked" data-nst="linked" checked>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>{{localize "niks-scene-transformations.Pad.Amount"}}</label>
+            <div class="form-fields nst-sides">
+                <label>{{localize "niks-scene-transformations.Pad.Top"}}
+                    <input type="number" data-nst="top" value="0" min="0" step="1"></label>
+                <label>{{localize "niks-scene-transformations.Pad.Right"}}
+                    <input type="number" data-nst="right" value="0" min="0" step="1"></label>
+                <label>{{localize "niks-scene-transformations.Pad.Bottom"}}
+                    <input type="number" data-nst="bottom" value="0" min="0" step="1"></label>
+                <label>{{localize "niks-scene-transformations.Pad.Left"}}
+                    <input type="number" data-nst="left" value="0" min="0" step="1"></label>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Pad.Hint"}}</p>
+        </div>
+    </fieldset>
+
+    <fieldset data-nst-section="rotate" hidden>
+        <legend>{{localize "niks-scene-transformations.Rotate.Legend"}}</legend>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-angle">{{localize "niks-scene-transformations.Rotate.Direction"}}</label>
+            <div class="form-fields">
+                <select id="{{rootId}}-nst-angle" data-nst="angle">
+                    <option value="90">{{localize "niks-scene-transformations.Rotate.Clockwise"}}</option>
+                    <option value="270">{{localize "niks-scene-transformations.Rotate.CounterClockwise"}}</option>
+                    <option value="180">{{localize "niks-scene-transformations.Rotate.Half"}}</option>
+                </select>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Rotate.Hint"}}</p>
+        </div>
+    </fieldset>
+    <p class="nst-warning" data-nst-hex hidden>
+        <i class="fa-solid fa-triangle-exclamation" inert></i> {{localize "niks-scene-transformations.Error.HexRotation"}}
+    </p>
+
+    <fieldset>
+        <legend>{{localize "niks-scene-transformations.Preview.Legend"}}</legend>
+        <div class="nst-preview">
+            <div class="nst-preview-area">
+                <div class="nst-preview-map"><i class="fa-solid fa-arrow-up" inert></i></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>{{localize "niks-scene-transformations.Size.Current"}}</label>
+            <div class="form-fields"><span class="nst-size" data-nst-size="current"></span></div>
+        </div>
+        <div class="form-group">
+            <label>{{localize "niks-scene-transformations.Size.New"}}</label>
+            <div class="form-fields"><span class="nst-size" data-nst-size="new"></span></div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>{{localize "niks-scene-transformations.Options.Legend"}}</legend>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-backup">{{localize "niks-scene-transformations.Options.Backup"}}</label>
+            <div class="form-fields">
+                <input type="checkbox" id="{{rootId}}-nst-backup" data-nst="backup" checked>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Options.BackupHint"}}</p>
+        </div>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-fog">{{localize "niks-scene-transformations.Options.ResetFog"}}</label>
+            <div class="form-fields">
+                <input type="checkbox" id="{{rootId}}-nst-fog" data-nst="resetFog" checked>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Options.ResetFogHint"}}</p>
+        </div>
+    </fieldset>
+
+    <button type="button" class="nst-apply" data-nst-apply>
+        <i class="fa-solid fa-wand-magic-sparkles" inert></i>
+        <span>{{localize "niks-scene-transformations.Apply"}}</span>
+    </button>
+</div>
