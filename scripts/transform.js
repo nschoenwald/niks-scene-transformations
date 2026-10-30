@@ -46,9 +46,11 @@ export function gridStep(grid) {
 
 /**
  * @typedef TransformPlan
- * @property {"rotate"|"pad"} type
- * @property {number} angle                         Clockwise rotation in degrees (0 for padding).
- * @property {{width: number, height: number, shiftX?: number, shiftY?: number}} changes   Scene field changes.
+ * @property {"rotate"|"pad"|"grid"} type
+ * @property {number} angle                         Clockwise rotation in degrees (0 for padding and grid size).
+ * @property {number} scale                         Factor by which pixel sizes change (1 unless the grid size does).
+ * @property {object} changes                       Scene field changes (width, height, shiftX, shiftY, grid.size).
+ * @property {BaseGrid} grid                        The grid after the transformation.
  * @property {(x: number, y: number) => {x: number, y: number}} mapPoint    Maps an old canvas point to the new canvas.
  * @property {boolean} convertLevelTextures         Turn Level background and foreground images into tiles.
  * @property {boolean} snapTokens                   Re-snap tokens that were snapped to the grid before.
@@ -94,7 +96,10 @@ export function planRotation(scene, angle) {
     return { x: to.x + p[0], y: to.y + p[1] };
   };
 
-  return { type: 'rotate', angle, changes, mapPoint, convertLevelTextures: quarter, snapTokens: false };
+  return {
+    type: 'rotate', angle, scale: 1, changes, grid: scene.grid, mapPoint,
+    convertLevelTextures: quarter, snapTokens: false,
+  };
 }
 
 /**
@@ -134,10 +139,63 @@ export function planPadding(scene, { top = 0, right = 0, bottom = 0, left = 0 } 
   return {
     type: 'pad',
     angle: 0,
+    scale: 1,
     changes,
+    grid,
     mapPoint: (x, y) => ({ x: x + dx, y: y + dy }),
     convertLevelTextures: true,
     snapTokens: grid.isHexagonal,
+  };
+}
+
+/**
+ * Plan changing the size of a grid space in pixels. Everything on the scene grows or shrinks with the grid, so the
+ * scene keeps its size in grid spaces and each placeable stays on the same grid spaces.
+ * @param {Scene} scene
+ * @param {number} size     The new grid size in pixels.
+ * @returns {TransformPlan}
+ */
+export function planGridSize(scene, size) {
+  if ( !Number.isInteger(size) || (size < CONST.GRID_MIN_SIZE) ) {
+    throw new TransformError(game.i18n.format(`${MODULE_ID}.Error.InvalidGridSize`, { min: CONST.GRID_MIN_SIZE }));
+  }
+  const src = scene._source;
+  if ( size === src.grid.size ) throw new TransformError(loc('Error.SameGridSize'));
+
+  const k = size / src.grid.size;
+  const changes = {
+    width: Math.max(1, Math.round(src.width * k)),
+    height: Math.max(1, Math.round(src.height * k)),
+    shiftX: Math.round(src.shiftX * k),
+    shiftY: Math.round(src.shiftY * k),
+    grid: { size },
+  };
+  const target = scene.clone(changes);
+  const grid = target.grid;
+
+  // Grid lines sit at multiples of the grid size from the canvas origin, on every grid type, so scaling around the
+  // origin maps grid spaces onto grid spaces. The padding usually scales along exactly; if rounding the scene size
+  // changed the number of padding spaces, move everything by whole grid spaces to make up for it.
+  const from = scene.dimensions;
+  const to = target.dimensions;
+  let dx = (to.sceneX + changes.shiftX) - (k * (from.sceneX + src.shiftX));
+  let dy = (to.sceneY + changes.shiftY) - (k * (from.sceneY + src.shiftY));
+  if ( dx || dy ) {
+    const ref = grid.getCenterPoint(grid.getOffset({ x: k * from.sceneRect.center.x, y: k * from.sceneRect.center.y }));
+    const moved = grid.getCenterPoint(grid.getOffset({ x: ref.x + dx, y: ref.y + dy }));
+    dx = moved.x - ref.x;
+    dy = moved.y - ref.y;
+  }
+
+  return {
+    type: 'grid',
+    angle: 0,
+    scale: k,
+    changes,
+    grid,
+    mapPoint: (x, y) => ({ x: (k * x) + dx, y: (k * y) + dy }),
+    convertLevelTextures: false,
+    snapTokens: false,
   };
 }
 
@@ -153,9 +211,11 @@ export function planPadding(scene, { top = 0, right = 0, bottom = 0, left = 0 } 
  */
 export function buildSceneUpdate(scene, plan) {
   const { mapPoint, angle } = plan;
+  const k = plan.scale ?? 1;
   const grid = scene.grid;
   const warnings = [];
   const rotate = r => Math.normalizeDegrees((r ?? 0) + angle);
+  const scaleInt = (n, min = 0) => Math.max(min, Math.round(n * k));
   const mapRounded = (x, y) => {
     const p = mapPoint(x, y);
     return { x: Math.round(p.x), y: Math.round(p.y) };
@@ -167,12 +227,14 @@ export function buildSceneUpdate(scene, plan) {
   const initial = scene._source.initial;
   if ( Number.isFinite(initial.x) && Number.isFinite(initial.y) ) {
     update.initial = { ...initial, ...mapRounded(initial.x, initial.y) };
+    if ( (k !== 1) && Number.isFinite(initial.scale) ) update.initial.scale = initial.scale / k;
   }
 
   // Tokens: keep the footprint on the same grid spaces and turn the art with the map
   update.tokens = scene.tokens.map(token => {
     const src = token._source;
     let { x, y, width, height } = mapFootprint(src, plan, grid.size);
+    // Rotation and padding plans keep the grid, so the token can be snapped with the current one
     if ( plan.snapTokens && isSnapped(token) ) ({ x, y } = token.getSnappedPosition({ x, y, width, height }));
     return {
       _id: token.id, x, y, width, height,
@@ -182,7 +244,11 @@ export function buildSceneUpdate(scene, plan) {
   });
 
   // Tiles rotate around their anchor point at (x, y)
-  const mapTile = (src, extra = {}) => ({ ...extra, ...mapRounded(src.x, src.y), rotation: rotate(src.rotation) });
+  const mapTile = (src, extra = {}) => {
+    const data = { ...extra, ...mapRounded(src.x, src.y), rotation: rotate(src.rotation) };
+    if ( k !== 1 ) Object.assign(data, { width: scaleInt(src.width), height: scaleInt(src.height) });
+    return data;
+  };
   update.tiles = scene.tiles.map(tile => mapTile(tile._source, { _id: tile.id }));
 
   // Level background and foreground images
@@ -196,8 +262,15 @@ export function buildSceneUpdate(scene, plan) {
       const t = level._source.textures;
       return { _id: level.id, textures: { rotation: rotate(t.rotation), offsetX: -t.offsetX, offsetY: -t.offsetY } };
     });
+  } else if ( k !== 1 ) {
+    // Level textures are drawn at the size of the scene rectangle, which scales with the grid; only offsets change
+    update.levels = scene.levels.map(level => {
+      const t = level._source.textures;
+      return { _id: level.id, textures: { offsetX: t.offsetX * k, offsetY: t.offsetY * k } };
+    });
   }
-  if ( scene.levels.some(l => l._source.fog?.src) ) warnings.push(loc('Warning.FogOverlay'));
+  // The fog overlay is drawn over the background image or the whole scene, so it only scales along
+  if ( (plan.type !== 'grid') && scene.levels.some(l => l._source.fog?.src) ) warnings.push(loc('Warning.FogOverlay'));
 
   // Drawings rotate around the center of their shape
   update.drawings = scene.drawings.map(drawing => {
@@ -205,14 +278,35 @@ export function buildSceneUpdate(scene, plan) {
     const w = src.shape.width ?? 0;
     const h = src.shape.height ?? 0;
     const c = mapPoint(src.x + (w / 2), src.y + (h / 2));
-    return { _id: drawing.id, x: c.x - (w / 2), y: c.y - (h / 2), rotation: rotate(src.rotation) };
+    const data = { _id: drawing.id, rotation: rotate(src.rotation) };
+    if ( k !== 1 ) {
+      data.shape = {
+        width: scaleInt(w),
+        height: scaleInt(h),
+        points: src.shape.points.map(n => n * k),
+      };
+      if ( src.shape.radius ) data.shape.radius = scaleInt(src.shape.radius, 1);
+      data.strokeWidth = scaleInt(src.strokeWidth);
+      data.fontSize = Math.clamp(Math.round(src.fontSize * k), 8, 256);
+    }
+    const nw = data.shape?.width ?? w;
+    const nh = data.shape?.height ?? h;
+    return { ...data, x: c.x - (nw / 2), y: c.y - (nh / 2) };
   });
 
   update.lights = scene.lights.map(light => ({
     _id: light.id, ...mapRounded(light._source.x, light._source.y), rotation: rotate(light._source.rotation),
   }));
   update.sounds = scene.sounds.map(sound => ({ _id: sound.id, ...mapRounded(sound._source.x, sound._source.y) }));
-  update.notes = scene.notes.map(note => ({ _id: note.id, ...mapRounded(note._source.x, note._source.y) }));
+  update.notes = scene.notes.map(note => {
+    const src = note._source;
+    const data = { _id: note.id, ...mapRounded(src.x, src.y) };
+    if ( k !== 1 ) {
+      data.iconSize = scaleInt(src.iconSize, 32);
+      data.fontSize = Math.clamp(Math.round(src.fontSize * k), 8, 128);
+    }
+    return data;
+  });
 
   // Walls keep their endpoint order, so the left/right direction of one-way walls is preserved by a rotation
   update.walls = scene.walls.map(wall => {
@@ -225,7 +319,7 @@ export function buildSceneUpdate(scene, plan) {
   update.regions = scene.regions.map(region => {
     const shapes = region._source.shapes.map(shape => {
       try {
-        return mapShape(shape, plan, grid);
+        return mapShape(shape, plan, grid, plan.grid ?? grid);
       } catch(err) {
         if ( !(err instanceof TransformError) ) throw err;
         warnings.push(err.message);
@@ -314,9 +408,10 @@ function computeSceneRect(scene, changes) {
 function mapFootprint({ x, y, width, height }, plan, size) {
   const c = plan.mapPoint(x + (width * size / 2), y + (height * size / 2));
   if ( plan.angle % 180 ) [width, height] = [height, width];
+  const newSize = size * (plan.scale ?? 1);
   return {
-    x: Math.round(c.x - (width * size / 2)),
-    y: Math.round(c.y - (height * size / 2)),
+    x: Math.round(c.x - (width * newSize / 2)),
+    y: Math.round(c.y - (height * newSize / 2)),
     width,
     height,
   };
@@ -335,14 +430,20 @@ function isSnapped(token) {
 
 /**
  * Map a Region shape. Shapes rotate around their origin; circles and rings have no rotation.
+ * Pixel sizes scale with the grid; this includes grid-based shapes, whose sizes are in pixels too.
  * @param {object} shape        The shape source data.
  * @param {TransformPlan} plan
- * @param {BaseGrid} grid
+ * @param {BaseGrid} grid       The current grid.
+ * @param {BaseGrid} newGrid    The grid after the transformation.
  * @returns {object}            The mapped shape source data.
  */
-function mapShape(shape, plan, grid) {
+function mapShape(shape, plan, grid, newGrid) {
   const { mapPoint, angle } = plan;
+  const k = plan.scale ?? 1;
   const s = foundry.utils.deepClone(shape);
+  const scaleKeys = keys => {
+    if ( k !== 1 ) for ( const key of keys ) s[key] *= k;
+  };
   switch ( s.type ) {
     case 'rectangle':
     case 'ellipse':
@@ -350,13 +451,17 @@ function mapShape(shape, plan, grid) {
     case 'line':
       Object.assign(s, mapPoint(s.x, s.y));
       s.rotation = Math.normalizeDegrees((s.rotation ?? 0) + angle);
+      scaleKeys({ rectangle: ['width', 'height'], ellipse: ['radiusX', 'radiusY'], cone: ['radius'],
+        line: ['length', 'width'] }[s.type]);
       break;
     case 'circle':
     case 'ring':
       Object.assign(s, mapPoint(s.x, s.y));
+      scaleKeys(s.type === 'ring' ? ['radius', 'innerWidth', 'outerWidth'] : ['radius']);
       break;
     case 'emanation':
-      s.base = mapShape(s.base, plan, grid);
+      s.base = mapShape(s.base, plan, grid, newGrid);
+      scaleKeys(['radius']);
       break;
     case 'polygon':
       for ( let i = 0; i < s.points.length; i += 2 ) {
@@ -377,7 +482,7 @@ function mapShape(shape, plan, grid) {
           offset = { i, j };
         }
         const c = grid.getCenterPoint(offset);
-        const { i, j } = grid.getOffset(mapPoint(c.x, c.y));
+        const { i, j } = newGrid.getOffset(mapPoint(c.x, c.y));
         return { i, j };
       });
       if ( s.origin ) s.origin = mapPoint(s.origin.x, s.origin.y);

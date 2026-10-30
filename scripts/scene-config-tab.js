@@ -1,5 +1,7 @@
 import { MODULE_ID, TAB_ID, loc } from './config.js';
-import { TransformError, canRotate, gridStep, planPadding, planRotation, transformScene } from './transform.js';
+import {
+  TransformError, canRotate, gridStep, planGridSize, planPadding, planRotation, transformScene,
+} from './transform.js';
 
 /**
  * The "Transform" tab of Scene Configuration.
@@ -46,6 +48,9 @@ function onRenderSceneConfig(app, element) {
     tab.querySelector('[data-nst="mode"] option[value="rotate"]').disabled = true;
     tab.querySelector('[data-nst-hex]').hidden = false;
   }
+  const gridSize = field(tab, 'gridSize');
+  gridSize.min = CONST.GRID_MIN_SIZE;
+  gridSize.value = scene._source.grid.size;
 
   const onChange = event => {
     event.stopPropagation();
@@ -82,6 +87,7 @@ function readState(tab) {
   return {
     mode: field(tab, 'mode').value,
     angle: Number(field(tab, 'angle').value),
+    gridSize: Math.round(Number(field(tab, 'gridSize').value) || 0),
     padding: Object.fromEntries(SIDES.map(s => [s, Math.max(0, Math.floor(Number(field(tab, s).value) || 0))])),
     backup: field(tab, 'backup').checked,
     resetFog: field(tab, 'resetFog').checked,
@@ -101,6 +107,7 @@ function refresh(tab, scene) {
 
   const { width: W, height: H } = scene._source;
   const step = gridStep(scene.grid);
+  let newStep = step;
   let width = W;
   let height = H;
   let left = 0;
@@ -113,6 +120,14 @@ function refresh(tab, scene) {
     top = (height - H) / 2;
     rotation = state.angle;
     valid = canRotate(scene);
+  } else if ( state.mode === 'grid' ) {
+    const k = state.gridSize / scene._source.grid.size;
+    valid = (state.gridSize >= CONST.GRID_MIN_SIZE) && (k !== 1);
+    if ( valid ) {
+      width = Math.max(1, Math.round(W * k));
+      height = Math.max(1, Math.round(H * k));
+      newStep = { x: step.x * k, y: step.y * k };
+    }
   } else {
     const p = state.padding;
     left = Math.round(p.left * step.x);
@@ -122,28 +137,34 @@ function refresh(tab, scene) {
     valid = SIDES.some(s => p[s] > 0);
   }
 
-  // Preview: the new scene area, with the current map placed inside it
-  const scale = Math.min(PREVIEW.width / width, PREVIEW.height / height);
+  // Preview: the new scene area, with the current map placed inside it. When the grid size changes, the map scales
+  // with the scene, and the preview is sized to the larger of the two so it visibly grows or shrinks.
+  const mapScale = width / W;
+  const scale = state.mode === 'grid'
+    ? Math.min(PREVIEW.width / Math.max(W, width), PREVIEW.height / Math.max(H, height))
+    : Math.min(PREVIEW.width / width, PREVIEW.height / height);
   const area = tab.querySelector('.nst-preview-area');
   area.style.width = `${Math.round(width * scale)}px`;
   area.style.height = `${Math.round(height * scale)}px`;
   const map = tab.querySelector('.nst-preview-map');
+  const mapW = state.mode === 'grid' ? W * mapScale : W;
+  const mapH = state.mode === 'grid' ? H * mapScale : H;
   Object.assign(map.style, {
     left: `${(left / width) * 100}%`,
     top: `${(top / height) * 100}%`,
-    width: `${(W / width) * 100}%`,
-    height: `${(H / height) * 100}%`,
+    width: `${(mapW / width) * 100}%`,
+    height: `${(mapH / height) * 100}%`,
     transform: rotation ? `rotate(${rotation}deg)` : '',
   });
   const src = previewImage(scene);
   map.style.backgroundImage = src ? `url(${JSON.stringify(src)})` : '';
   map.classList.toggle('no-image', !src);
 
-  const describe = (w, h) => game.i18n.format(`${MODULE_ID}.Size.Value`, {
-    width: w, height: h, columns: Math.round(w / step.x), rows: Math.round(h / step.y),
+  const describe = (w, h, s) => game.i18n.format(`${MODULE_ID}.Size.Value`, {
+    width: w, height: h, columns: Math.round(w / s.x), rows: Math.round(h / s.y),
   });
-  tab.querySelector('[data-nst-size="current"]').textContent = describe(W, H);
-  tab.querySelector('[data-nst-size="new"]').textContent = describe(width, height);
+  tab.querySelector('[data-nst-size="current"]').textContent = describe(W, H, step);
+  tab.querySelector('[data-nst-size="new"]').textContent = describe(width, height, newStep);
   tab.querySelector('[data-nst-apply]').disabled = !valid;
 }
 
@@ -170,14 +191,17 @@ async function apply(scene, tab, button) {
   const state = readState(tab);
   let plan;
   try {
-    plan = state.mode === 'rotate' ? planRotation(scene, state.angle) : planPadding(scene, state.padding);
+    if ( state.mode === 'rotate' ) plan = planRotation(scene, state.angle);
+    else if ( state.mode === 'grid' ) plan = planGridSize(scene, state.gridSize);
+    else plan = planPadding(scene, state.padding);
   } catch(err) {
     if ( !(err instanceof TransformError) ) throw err;
     ui.notifications.warn(err.message);
     return;
   }
 
-  const lines = [loc(state.mode === 'rotate' ? 'Confirm.Rotate' : 'Confirm.Pad'), loc('Confirm.Unsaved')];
+  const confirm = { rotate: 'Confirm.Rotate', grid: 'Confirm.Grid', pad: 'Confirm.Pad' }[state.mode];
+  const lines = [loc(confirm), loc('Confirm.Unsaved')];
   if ( !state.backup ) lines.push(loc('Confirm.NoBackup'));
   const confirmed = await foundry.applications.api.DialogV2.confirm({
     window: { title: 'niks-scene-transformations.Confirm.Title', icon: 'fa-solid fa-arrows-rotate' },

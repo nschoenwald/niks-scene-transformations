@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Latest Release](https://img.shields.io/github/v/release/nschoenwald/niks-scene-transformations?color=purple)](https://github.com/nschoenwald/niks-scene-transformations/releases/latest)
 
-Rotate a scene or give it more room, without rebuilding anything. Every token, wall, door, light, sound, tile, drawing, journal note and region moves along, so everything stays exactly where it belongs on the map. Works with **any game system** in **Foundry VTT v14**.
+Rotate a scene, give it more room or change its grid size, without rebuilding anything. Every token, wall, door, light, sound, tile, drawing, journal note and region moves along, so everything stays exactly where it belongs on the map. Works with **any game system** in **Foundry VTT v14**.
 
 <img width="673" height="786" alt="image" src="https://github.com/user-attachments/assets/b71ad93d-c294-4bfa-a36a-24fa30036a88" />
 
@@ -26,6 +26,11 @@ Rotate a scene or give it more room, without rebuilding anything. Every token, w
   - Tokens turn with the map and keep their grid spaces. Tokens with **Lock Artwork Rotation** keep their artwork upright. Tokens that are longer than they are wide (for example 2×1) swap width and height on a quarter turn.
   - The grid stays aligned with the map, even when the scene size isn't a multiple of the grid size.
   - On a quarter turn the background and foreground images become locked tiles turned with the map. A half turn keeps them as backgrounds.
+- **Change the grid size**:
+  - Enter the new size of a grid space in pixels, for example 100 px for a map drawn at 200 px per grid space.
+  - The map and everything on it grow or shrink with the grid, so the scene keeps the same number of grid spaces: a 30 × 30 map stays 30 × 30. Tokens keep their spaces, and lights and sounds keep their range in feet or metres.
+  - Tiles, drawings, journal note icons and region shapes are resized along. The initial view zooms so it shows the same part of the map.
+  - The background and foreground images stay backgrounds and scale with the scene.
 - **Preview**: Shows the new layout and the current and new size before you apply anything.
 - **Safety**:
   - **Keep a backup copy** (on by default) saves an untouched copy of the scene first, hidden from the navigation bar.
@@ -41,7 +46,8 @@ Rotate a scene or give it more room, without rebuilding anything. Every token, w
 - **Levels**: Scenes with several levels work. Each level's images become tiles on that level.
 - **Not supported**:
   - Rotating scenes with a hexagonal grid (adding space works).
-  - Fog overlay images aren't moved or rotated. You'll get a warning if the scene has one.
+  - Fog overlay images aren't moved or rotated when you add space or rotate. You'll get a warning if the scene has one. Changing the grid size scales them along.
+  - Journal note icons don't get smaller than 32 px, which is Foundry's minimum.
   - Region shapes added by other modules with their own shape types are left in place, with a warning.
 - **Unsaved changes**: Applying a transformation saves right away. Unsaved changes in other tabs of the Configure window are lost.
 
@@ -53,8 +59,9 @@ The API is available on `game.modules.get("niks-scene-transformations").api` aft
 
 - `rotateScene(scene, angle, options)` rotates clockwise by 90, 180 or 270 degrees.
 - `padScene(scene, {top, right, bottom, left}, options)` adds grid spaces on each side.
-- `options`: `{backup = false, resetFog = true, thumbnail = true}`. Both return `{scene, backup, warnings}`.
-- `planRotation(scene, angle)`, `planPadding(scene, padding)` and `buildSceneUpdate(scene, plan)` build the Scene update without saving it, for previews or custom workflows. `transformScene(scene, plan, options)` applies a plan.
+- `resizeGrid(scene, size, options)` changes the grid size to `size` pixels and scales everything along.
+- `options`: `{backup = false, resetFog = true, thumbnail = true}`. All three return `{scene, backup, warnings}`.
+- `planRotation(scene, angle)`, `planPadding(scene, padding)`, `planGridSize(scene, size)` and `buildSceneUpdate(scene, plan)` build the Scene update without saving it, for previews or custom workflows. `transformScene(scene, plan, options)` applies a plan.
 - The Scene update carries the option `{"niks-scene-transformations": {type, angle}}`, so `preUpdateScene` / `updateScene` hooks can tell a transformation apart.
 
 ---

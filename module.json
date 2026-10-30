@@ -1,7 +1,7 @@
 {
   "id": "niks-scene-transformations",
   "title": "Nik's Scene Transformations",
-  "description": "Rotate scenes and add playable space around them, with every token, wall, light, tile, drawing, note, sound and region moved along so everything stays in place.",
+  "description": "Rotate scenes, add playable space around them or change their grid size, with every token, wall, light, tile, drawing, note, sound and region moved along so everything stays in place.",
   "authors": [
     {
       "name": "Nik",
@@ -11,7 +11,7 @@
   "url": "https://github.com/nschoenwald/niks-scene-transformations",
   "bugs": "https://github.com/nschoenwald/niks-scene-transformations/issues",
   "changelog": "https://github.com/nschoenwald/niks-scene-transformations/blob/main/CHANGELOG.md",
-  "version": "14.0.0",
+  "version": "14.1.0",
   "compatibility": {
     "minimum": "14",
     "verified": "14",

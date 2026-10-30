@@ -1,6 +1,8 @@
 import { MODULE_ID } from './config.js';
 import { registerSceneConfigTab } from './scene-config-tab.js';
-import { ROTATIONS, buildSceneUpdate, canRotate, planPadding, planRotation, transformScene } from './transform.js';
+import {
+  ROTATIONS, buildSceneUpdate, canRotate, planGridSize, planPadding, planRotation, transformScene,
+} from './transform.js';
 
 Hooks.once('init', () => {
   registerSceneConfigTab();
@@ -11,6 +13,7 @@ Hooks.once('init', () => {
     canRotate,
     planRotation,
     planPadding,
+    planGridSize,
     buildSceneUpdate,
     transformScene,
     /**
@@ -27,5 +30,12 @@ Hooks.once('init', () => {
      * @param {object} [options]    See {@link transformScene}.
      */
     padScene: (scene, padding, options) => transformScene(scene, planPadding(scene, padding), options),
+    /**
+     * Change the size of a grid space in pixels, scaling everything on the scene along.
+     * @param {Scene} scene
+     * @param {number} size         The new grid size in pixels.
+     * @param {object} [options]    See {@link transformScene}.
+     */
+    resizeGrid: (scene, size, options) => transformScene(scene, planGridSize(scene, size), options),
   };
 });

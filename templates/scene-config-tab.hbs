@@ -9,6 +9,7 @@
                 <select id="{{rootId}}-nst-mode" data-nst="mode">
                     <option value="pad">{{localize "niks-scene-transformations.Mode.Pad"}}</option>
                     <option value="rotate">{{localize "niks-scene-transformations.Mode.Rotate"}}</option>
+                    <option value="grid">{{localize "niks-scene-transformations.Mode.Grid"}}</option>
                 </select>
             </div>
         </div>
@@ -50,6 +51,18 @@
                 </select>
             </div>
             <p class="hint">{{localize "niks-scene-transformations.Rotate.Hint"}}</p>
+        </div>
+    </fieldset>
+
+    <fieldset data-nst-section="grid" hidden>
+        <legend>{{localize "niks-scene-transformations.Grid.Legend"}}</legend>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-grid-size">{{localize "niks-scene-transformations.Grid.Size"}}</label>
+            <div class="form-fields">
+                <input type="number" id="{{rootId}}-nst-grid-size" data-nst="gridSize" min="20" step="1">
+                <span class="units">{{localize "niks-scene-transformations.Grid.Units"}}</span>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Grid.Hint"}}</p>
         </div>
     </fieldset>
     <p class="nst-warning" data-nst-hex hidden>
