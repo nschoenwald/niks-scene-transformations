@@ -2,15 +2,16 @@
   "niks-scene-transformations": {
     "Tab": {
       "Label": "Transform",
-      "Intro": "Add or remove space, rotate or flip the scene, change its grid size or attach another scene. Tokens, walls, doors, lights, sounds, tiles, drawings, notes and regions move along, so everything stays where it belongs on the map. Changes are saved right away."
+      "Intro": "Add or remove space, rotate or mirror the scene, change its grid size, attach another scene or extract an area to a new scene. Tokens, walls, doors, lights, sounds, tiles, drawings, notes and regions move along, so everything stays where it belongs on the map. Changes are saved right away."
     },
     "Mode": {
       "Legend": "Transformation",
       "Label": "Type",
       "Pad": "Add or remove space",
-      "Rotate": "Rotate or flip the scene",
+      "Rotate": "Rotate or mirror the scene",
       "Grid": "Change the grid size",
-      "Stitch": "Attach another scene"
+      "Stitch": "Attach another scene",
+      "Extract": "Extract an area to a new scene"
     },
     "Pad": {
       "Legend": "Add or Remove Space",
@@ -27,17 +28,17 @@
       "RemoveOutsideHint": "Deletes tokens, walls, lights, sounds, notes, tiles, drawings and regions entirely in the removed space. Otherwise they stay in the dark border around the scene.",
       "OutsideCount": "{count} would be deleted.",
       "Images": "Cut images to the new size",
-      "ImagesHint": "Saves the visible part of the background and foreground images as new files in the world folder, so the removed part doesn't show in the border around the scene."
+      "ImagesHint": "Saves the visible part of the background and foreground images as new files (see the module setting \"Folder for cut images\"), so the removed part doesn't show in the border around the scene."
     },
     "Rotate": {
-      "Legend": "Rotate or Flip",
+      "Legend": "Rotate or Mirror",
       "Direction": "Turn",
       "Clockwise": "90° clockwise",
       "CounterClockwise": "90° counter-clockwise",
       "Half": "180°",
-      "Hint": "On a quarter turn, background and foreground images become locked tiles turned with the map. A half turn or a flip keeps them as backgrounds. Flipping turns tokens to face the mirrored way without mirroring their artwork.",
-      "FlipX": "Flip left to right",
-      "FlipY": "Flip top to bottom"
+      "Hint": "On a quarter turn, background and foreground images become locked tiles turned with the map. A half turn or a mirror keeps them as backgrounds. Mirroring turns tokens to face the mirrored way without mirroring their artwork.",
+      "MirrorX": "Mirror left to right",
+      "MirrorY": "Mirror top to bottom"
     },
     "Grid": {
       "Legend": "Grid Size",
@@ -61,8 +62,32 @@
       "Tokens": "Copy its tokens",
       "Hint": "This scene grows to fit both maps. The other scene's map, walls, lights, sounds, notes, tiles, drawings, regions and, if ticked, tokens are copied in, scaled to this scene's grid size. The other scene isn't changed."
     },
+    "Extract": {
+      "Legend": "Extract an Area",
+      "Intro": "Creates a new scene from part of this one, for example a single building from a city map. This scene isn't changed.",
+      "Area": "Area",
+      "Column": "Column",
+      "Row": "Row",
+      "Width": "Width",
+      "Height": "Height",
+      "AreaHint": "In grid spaces, counted from the top-left corner. Or choose the area in the preview below.",
+      "Selection": "Area to extract. Arrow keys move it, Shift and arrow keys resize it.",
+      "DragHint": "Drag on the map to choose an area. Drag the area to move it, or its handles to resize it. Arrow keys move it, Shift and arrow keys resize it.",
+      "Name": "New scene name",
+      "DefaultName": "{name} (Extract)",
+      "Tokens": "Copy tokens",
+      "Open": "Open the new scene",
+      "Hint": "Everything in the area is copied: walls are cut at the edge, and background and foreground images are cut to the area (see the module setting \"Folder for cut images\"). All scene settings, such as lighting and grid, are taken over.",
+      "Create": "Create Scene",
+      "Summary": "Copies: {list}",
+      "Empty": "Only the map is in this area.",
+      "Images": "Images"
+    },
     "Preview": {
-      "Legend": "Preview"
+      "Legend": "Preview",
+      "Added": "Added space",
+      "Removed": "Removed",
+      "Edge": "New scene edge"
     },
     "Size": {
       "Current": "Current size",
@@ -84,7 +109,7 @@
       "Unsaved": "This saves immediately. Unsaved changes in other tabs of this window will be lost.",
       "NoBackup": "<strong>No backup copy will be made.</strong>",
       "Grid": "Change the grid size of this scene and scale everything on it?",
-      "Mirror": "Flip this scene and everything on it?",
+      "Mirror": "Mirror this scene and everything on it?",
       "Crop": "Change the space around this scene and move everything on it?",
       "Stitch": "Attach a copy of \"{name}\" to this scene?",
       "Delete": "<strong>{count} placeables in the removed space will be deleted.</strong>",
@@ -93,23 +118,26 @@
     "Notify": {
       "Success": "Transformed scene \"{name}\".",
       "Backup": "Saved a backup copy as \"{name}\".",
-      "Restored": "Restored scene \"{name}\" from its backup copy."
+      "Restored": "Restored scene \"{name}\" from its backup copy.",
+      "Extracted": "Created scene \"{name}\"."
     },
     "Backup": {
-      "Name": "{name} (Backup)"
+      "Name": "{name} (Backup {time})"
     },
     "Tile": {
       "background": "{level} Background",
       "foreground": "{level} Foreground"
     },
     "Warning": {
-      "FogOverlay": "This scene has a fog overlay image. It isn't moved or rotated with the map.",
+      "FogOverlay": "This scene has a fog overlay image on a map that isn't stretched to fill the scene. The map became a tile, so the overlay can't follow it and may no longer line up.",
       "UnknownShape": "A region shape of type \"{type}\" isn't supported and was left in place.",
-      "CropFailed": "The image of \"{name}\" couldn't be cut and was kept whole."
+      "CropFailed": "The image of \"{name}\" couldn't be cut and was kept whole.",
+      "PackageFolder": "The folder \"{folder}\" belongs to a module or system, whose updates would delete the images. They were saved in the world folder instead.",
+      "HexModes": "Scenes with a hexagonal grid can't be rotated, mirrored or extracted from."
     },
     "Error": {
       "InvalidAngle": "Scenes can only be rotated by 90, 180 or 270 degrees.",
-      "HexRotation": "Scenes with a hexagonal grid can't be rotated or flipped.",
+      "HexRotation": "Scenes with a hexagonal grid can't be rotated or mirrored.",
       "InvalidPadding": "Space must be given in whole grid spaces.",
       "NoPadding": "Enter how many grid spaces to add or remove on at least one side.",
       "NotGM": "Only a Gamemaster can transform scenes.",
@@ -117,14 +145,17 @@
       "InvalidGridSize": "The grid size must be a whole number of pixels, {min} or more.",
       "SameGridSize": "Enter a grid size different from the current one.",
       "TooSmall": "The scene would be smaller than one grid space.",
-      "InvalidMirror": "Scenes can only be flipped left to right or top to bottom.",
+      "InvalidMirror": "Scenes can only be mirrored left to right or top to bottom.",
       "StitchSame": "Choose another scene to attach.",
       "StitchSide": "Choose the side to attach the scene to.",
       "StitchHex": "Scenes with a hexagonal grid can't be attached or attached to.",
       "StitchGap": "Gap and shift must be whole grid spaces, and the gap 0 or more.",
       "NoBackup": "This scene has no backup copy to restore.",
       "Upload": "The image couldn't be saved.",
-      "RestoreFailed": "Restoring the scene failed: {error}"
+      "RestoreFailed": "Restoring the scene failed: {error}",
+      "ExtractHex": "Areas can't be extracted from scenes with a hexagonal grid.",
+      "ExtractArea": "Choose an area of whole grid spaces within the scene.",
+      "ExtractFailed": "Creating the new scene failed: {error}"
     },
     "Restore": {
       "Legend": "Undo Last Transformation",
@@ -132,6 +163,12 @@
       "Info": "\"{name}\" from {time}",
       "Button": "Restore",
       "Hint": "Brings this scene back to how it was before the last transformation that kept a backup copy, then deletes that copy. Tokens and other placeables get their old ids back, and anything added since is removed."
+    },
+    "Settings": {
+      "ImageFolder": {
+        "Name": "Folder for cut images",
+        "Hint": "Where background and foreground images cut down by removing space are saved. Leave empty to use the world folder (worlds/<world>/niks-scene-transformations), or the same S3 bucket when the map is stored there. Module and system folders can't be used, because updates would delete the files."
+      }
     }
   }
 }

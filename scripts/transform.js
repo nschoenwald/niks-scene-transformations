@@ -1,5 +1,5 @@
 import { MODULE_ID, loc } from './config.js';
-import { cropLevelImages } from './image-crop.js';
+import { cropKeptLevels, cropLevelImages } from './image-crop.js';
 
 /**
  * Scene transformations.
@@ -13,7 +13,7 @@ import { cropLevelImages } from './image-crop.js';
 /** Rotation angles supported by {@link planRotation}, clockwise in degrees. */
 export const ROTATIONS = [90, 180, 270];
 
-/** Mirror axes supported by {@link planMirror}: "x" flips left and right, "y" flips top and bottom. */
+/** Mirror axes supported by {@link planMirror}: "x" mirrors left to right, "y" top to bottom. */
 export const MIRRORS = ['x', 'y'];
 
 /** Sides a scene can be attached to by {@link planStitch}. */
@@ -59,7 +59,7 @@ export function gridStep(grid) {
 
 /**
  * @typedef TransformPlan
- * @property {"rotate"|"mirror"|"pad"|"grid"|"stitch"} type
+ * @property {"rotate"|"mirror"|"pad"|"grid"|"stitch"|"extract"} type
  * @property {number} angle                         Clockwise rotation in degrees (0 unless rotating).
  * @property {"x"|"y"|null} mirror                  Mirror axis, if mirroring.
  * @property {number} scale                         Factor by which pixel sizes change (1 unless the grid size does).
@@ -68,8 +68,12 @@ export function gridStep(grid) {
  * @property {PIXI.Rectangle} rect                  The scene rectangle after the transformation.
  * @property {(x: number, y: number) => {x: number, y: number}} mapPoint    Maps an old canvas point to the new canvas.
  * @property {boolean} convertLevelTextures         Turn Level background and foreground images into tiles.
+ * @property {boolean} [keepFogLevels=true]         Keep the images of Levels with a fog overlay as Level textures
+ *                                                  instead, so the overlay keeps following the background.
  * @property {boolean} snapTokens                   Re-snap tokens that were snapped to the grid before.
  * @property {boolean} [removeOutside]              Delete placeables that end up entirely outside the scene.
+ * @property {boolean} [clipWalls]                  Cut walls crossing the scene edge at the edge.
+ * @property {boolean} [dropTokens]                 Delete all tokens.
  * @property {boolean} [cropImages]                 Cut images turned into tiles to the new scene rectangle.
  * @property {StitchSource} [source]                The scene attached by a stitch plan.
  */
@@ -244,6 +248,108 @@ export function planCrop(scene, crop = {}, options) {
 }
 
 /**
+ * The grid spaces covering a scene, for choosing an area to extract. Columns and rows are counted from the grid space
+ * holding the scene's top-left corner, and include grid spaces only partly on the scene.
+ * @param {Scene} scene
+ * @returns {{size: number, column: number, row: number, columns: number, rows: number, rect: PIXI.Rectangle}}
+ *   `column` and `row` are the grid offsets of the first grid space; `rect` is the scene rectangle.
+ */
+export function extractGrid(scene) {
+  const size = scene.grid.size;
+  const rect = scene.dimensions.sceneRect;
+  const column = Math.floor((rect.x / size) + 1e-6);
+  const row = Math.floor((rect.y / size) + 1e-6);
+  return {
+    size, column, row, rect,
+    columns: Math.ceil(((rect.x + rect.width) / size) - 1e-6) - column,
+    rows: Math.ceil(((rect.y + rect.height) / size) - 1e-6) - row,
+  };
+}
+
+/**
+ * Can an area of this scene be extracted? Hexagonal grids aren't supported.
+ * @param {Scene} scene
+ * @returns {boolean}
+ */
+export function canExtract(scene) {
+  return !scene.grid.isHexagonal;
+}
+
+/**
+ * Plan cutting a scene down to an area of whole grid spaces. Applied to a copy of a scene, this extracts the area:
+ * placeables entirely outside are deleted, walls are cut at the new edge and images are cut to the area.
+ * @param {Scene} scene
+ * @param {{x: number, y: number, width: number, height: number}} area   In grid spaces, see {@link extractGrid}.
+ * @param {object} [options]
+ * @param {boolean} [options.tokens=true]   Keep tokens in the area.
+ * @returns {TransformPlan}
+ */
+export function planExtract(scene, area, { tokens = true } = {}) {
+  if ( !canExtract(scene) ) throw new TransformError(loc('Error.ExtractHex'));
+  const g = extractGrid(scene);
+  const { x, y, width, height } = area ?? {};
+  const valid = [x, y, width, height].every(Number.isInteger) && (x >= 0) && (y >= 0) && (width >= 1)
+    && (height >= 1) && (x + width <= g.columns) && (y + height <= g.rows);
+  if ( !valid ) throw new TransformError(loc('Error.ExtractArea'));
+
+  // The area starts on a grid line; with no shift, the new scene rectangle does too, so the grid stays on the map
+  const selection = { x: (g.column + x) * g.size, y: (g.row + y) * g.size };
+  const changes = { width: width * g.size, height: height * g.size, shiftX: 0, shiftY: 0 };
+  const to = computeSceneRect(scene, changes);
+  const dx = to.x - selection.x;
+  const dy = to.y - selection.y;
+  return {
+    type: 'extract',
+    angle: 0,
+    mirror: null,
+    scale: 1,
+    changes,
+    grid: scene.grid,
+    rect: to,
+    mapPoint: (px, py) => ({ x: px + dx, y: py + dy }),
+    convertLevelTextures: true,
+    snapTokens: false,
+    removeOutside: true,
+    clipWalls: true,
+    cropImages: true,
+    dropTokens: !tokens,
+  };
+}
+
+/**
+ * Create a new scene from an area of a scene. The scene itself isn't changed.
+ * @param {Scene} scene
+ * @param {{x: number, y: number, width: number, height: number}} area   In grid spaces, see {@link extractGrid}.
+ * @param {object} [options]
+ * @param {string} [options.name]           Name of the new scene.
+ * @param {boolean} [options.tokens=true]   Copy tokens in the area.
+ * @returns {Promise<{scene: Scene, warnings: string[]}>}
+ */
+export async function extractScene(scene, area, { name, tokens = true } = {}) {
+  if ( !game.user.isGM ) throw new TransformError(loc('Error.NotGM'));
+  planExtract(scene, area, { tokens }); // Validate before creating anything
+
+  // Start from a full copy, which keeps all scene settings, then cut it down like removing space
+  const data = scene.toObject();
+  for ( const key of ['_id', '_stats', 'thumb', 'navOrder', 'sort'] ) delete data[key];
+  Object.assign(data, {
+    name: name?.trim() || game.i18n.format(`${MODULE_ID}.Extract.DefaultName`, { name: scene.name }),
+    active: false,
+    navigation: false,
+  });
+  delete data.flags?.[MODULE_ID]?.backup;
+  const copy = await getDocumentClass('Scene').create(data);
+  try {
+    const { warnings } = await transformScene(copy, planExtract(copy, area, { tokens }),
+      { backup: false, resetFog: false });
+    return { scene: copy, warnings };
+  } catch(err) {
+    await copy.delete();
+    throw err;
+  }
+}
+
+/**
  * Plan changing the size of a grid space in pixels. Everything on the scene grows or shrinks with the grid, so the
  * scene keeps its size in grid spaces and each placeable stays on the same grid spaces.
  * @param {Scene} scene
@@ -265,7 +371,7 @@ export function planGridSize(scene, size) {
     shiftY: Math.round(src.shiftY * k),
     grid: { size },
   };
-  const target = scene.clone(changes);
+  const target = previewClone(scene, changes);
   const grid = target.grid;
 
   // Grid lines sit at multiples of the grid size from the canvas origin, on every grid type, so scaling around the
@@ -370,6 +476,7 @@ export function planStitch(scene, other, { side = 'right', align = 'start', gap 
     rect: plan.rect,
     mapPoint: (px, py) => plan.mapPoint((k * px) + tx, (k * py) + ty),
     convertLevelTextures: true,
+    keepFogLevels: false, // Copies become tiles; the other scene's fog overlay isn't copied
     snapTokens: false,
   };
   const a = plan.mapPoint(placed.x, placed.y);
@@ -393,6 +500,7 @@ export function planStitch(scene, other, { side = 'right', align = 'start', gap 
  * @property {string[]} warnings                        Messages for the user.
  * @property {Record<string, string[]>} deletions       Ids of placeables to delete first, by Document name.
  * @property {Record<string, object[]>} creations       Placeables to create afterwards, by Document name.
+ * @property {KeptLevel[]} keptLevels                   Level images kept as Level textures, for cutting them.
  */
 
 /**
@@ -419,6 +527,10 @@ export function buildSceneUpdate(scene, plan) {
   // Placeables entirely outside the new scene rectangle are deleted instead of moved, if the plan asks for it
   const rect = plan.rect;
   const keep = (documentName, id, bounds) => {
+    if ( (documentName === 'Token') && plan.dropTokens ) {
+      (deletions.Token ??= []).push(id);
+      return false;
+    }
     if ( !plan.removeOutside || !rect || intersects(bounds, rect) ) return true;
     (deletions[documentName] ??= []).push(id);
     return false;
@@ -481,10 +593,14 @@ export function buildSceneUpdate(scene, plan) {
   }).filter(Boolean);
 
   // Level background and foreground images
+  let keptLevels = [];
   if ( plan.convertLevelTextures ) {
-    const { tiles, levels } = levelTexturesToTiles(scene);
+    const { tiles, levels, kept, fogLost } = levelTexturesToTiles(scene, plan);
     for ( const tile of tiles ) update.tiles.push(mapTile(tile, tile));
     if ( levels.length ) update.levels = levels;
+    keptLevels = kept;
+    // A fog overlay the size of the background copies the background's placement, which a tile doesn't have
+    if ( fogLost ) warnings.push(loc('Warning.FogOverlay'));
   } else if ( angle || mirror ) {
     // Half turns and mirrors keep the image's size, so a turned or flipped Level texture works and stays a background
     update.levels = scene.levels.map(level => {
@@ -501,11 +617,6 @@ export function buildSceneUpdate(scene, plan) {
       const t = level._source.textures;
       return { _id: level.id, textures: { offsetX: t.offsetX * k, offsetY: t.offsetY * k } };
     });
-  }
-  // The fog overlay is drawn over the background image or the whole scene, so it only follows a scaled or flipped
-  // background
-  if ( (plan.convertLevelTextures || angle) && scene.levels.some(l => l._source.fog?.src) ) {
-    warnings.push(loc('Warning.FogOverlay'));
   }
 
   // Drawings rotate around the center of their shape
@@ -569,9 +680,18 @@ export function buildSceneUpdate(scene, plan) {
         if ( src.animation.type === 'swing' ) data.animation.direction = -(src.animation.direction ?? 1);
       }
     }
-    if ( plan.removeOutside && rect && !segmentIntersects(a, b, rect) ) {
-      (deletions.Wall ??= []).push(wall.id);
-      return null;
+    if ( plan.removeOutside && rect ) {
+      const clipped = clipSegment(a, b, rect);
+      // Walls only touching the edge are outside too
+      const length = clipped ? Math.hypot(clipped[1].x - clipped[0].x, clipped[1].y - clipped[0].y) : 0;
+      if ( length < 1 ) {
+        (deletions.Wall ??= []).push(wall.id);
+        return null;
+      }
+      if ( plan.clipWalls ) {
+        const [p, q] = clipped.map(pt => ({ x: Math.round(pt.x), y: Math.round(pt.y) }));
+        data.c = [p.x, p.y, q.x, q.y];
+      }
     }
     return data;
   }).filter(Boolean);
@@ -599,7 +719,7 @@ export function buildSceneUpdate(scene, plan) {
     warnings.push(...result.warnings);
   }
 
-  return { update, warnings: Array.from(new Set(warnings)), deletions, creations };
+  return { update, warnings: Array.from(new Set(warnings)), deletions, creations, keptLevels };
 }
 
 /**
@@ -625,25 +745,33 @@ export function countOutside(scene, plan) {
  */
 export async function transformScene(scene, plan, { backup = false, resetFog = true, thumbnail = true } = {}) {
   if ( !game.user.isGM ) throw new TransformError(loc('Error.NotGM'));
-  const { update, warnings, deletions, creations } = buildSceneUpdate(scene, plan);
+  const { update, warnings, deletions, creations, keptLevels } = buildSceneUpdate(scene, plan);
 
   let copy = null;
   if ( backup ) {
     copy = await scene.clone({
-      name: game.i18n.format(`${MODULE_ID}.Backup.Name`, { name: scene.name }),
+      name: game.i18n.format(`${MODULE_ID}.Backup.Name`, {
+        name: scene.name,
+        time: new Date().toLocaleTimeString(game.i18n.lang, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }),
+      }),
       active: false,
       navigation: false,
       flags: { [MODULE_ID]: { backup: { of: scene.id, type: plan.type, time: Date.now() } } },
     }, { save: true });
   }
 
-  if ( plan.cropImages ) await cropLevelImages(update.tiles, plan.rect, warnings);
+  if ( plan.cropImages ) {
+    await cropLevelImages(scene, update.tiles, plan.rect, warnings);
+    await cropKeptLevels(scene, update.levels ?? [], keptLevels, plan.rect, warnings);
+  }
 
   // Deleted placeables are left out of the update, which would otherwise create them again
   for ( const [documentName, ids] of Object.entries(deletions) ) {
     await scene.deleteEmbeddedDocuments(documentName, ids);
   }
+  const redrawn = canvasRedrawn(scene);
   await scene.update(update, { [MODULE_ID]: { type: plan.type, angle: plan.angle, mirror: plan.mirror } });
+  await redrawn;
 
   // Copies are created as documents of their own, so creation hooks and Region behaviors run as usual
   for ( const [documentName, data] of Object.entries(creations) ) {
@@ -696,11 +824,38 @@ export async function restoreBackup(scene, backup, { resetFog = true, thumbnail 
   for ( const collection of [...Object.values(PLACEABLES), 'levels'] ) {
     if ( collection in data ) data[collection] = _replace(data[collection]);
   }
+  const redrawn = canvasRedrawn(scene);
   await scene.update(data, { [MODULE_ID]: { type: 'restore' } });
+  await redrawn;
   await backup.delete();
   await finishTransformation(scene, { resetFog, thumbnail });
   return scene;
 }
+
+/**
+ * When the scene is on the canvas, the update makes core redraw the canvas without waiting for it. Resetting fog or
+ * rendering the thumbnail during that redraw leaves the canvas black, so wait for it to finish.
+ * Call before the update; the returned promise resolves once the canvas is ready again (or right away).
+ * @param {Scene} scene
+ * @returns {Promise<void>}
+ */
+function canvasRedrawn(scene) {
+  if ( canvas.scene?.id !== scene.id ) return Promise.resolve();
+  return new Promise(resolve => {
+    const id = Hooks.once('canvasReady', () => {
+      clearTimeout(timeout);
+      resolve();
+    });
+    // Don't wait forever if the update didn't redraw the canvas or the redraw failed
+    const timeout = setTimeout(() => {
+      Hooks.off('canvasReady', id);
+      resolve();
+    }, REDRAW_TIMEOUT);
+  });
+}
+
+/** Longest time in milliseconds to wait for the canvas to redraw after an update. */
+const REDRAW_TIMEOUT = 20000;
 
 /**
  * Reset fog and regenerate the thumbnail after the scene changed.
@@ -719,6 +874,8 @@ async function finishTransformation(scene, { resetFog, thumbnail }) {
       console.warn(`${MODULE_ID} | Could not regenerate the thumbnail of scene "${scene.name}".`, err);
     }
   }
+  // Last resort: redraw a canvas that didn't come back, which the GM would otherwise do with "View Scene"
+  if ( (canvas.scene?.id === scene.id) && !canvas.ready ) await canvas.draw();
 }
 
 /* -------------------------------------------- */
@@ -855,7 +1012,19 @@ function normalizePhase(phase, size) {
  * @returns {PIXI.Rectangle}
  */
 function computeSceneRect(scene, changes) {
-  return scene.clone(changes).dimensions.sceneRect;
+  return previewClone(scene, changes).dimensions.sceneRect;
+}
+
+/**
+ * An unsaved copy of the scene with changes, for measuring. Scene#clone writes `active: false` and
+ * `navigation: false` into the data it's given, so it gets a copy: passing the plan's changes would put those into the
+ * scene update, deactivating the scene and hiding it from the navigation bar.
+ * @param {Scene} scene
+ * @param {object} changes
+ * @returns {Scene}
+ */
+function previewClone(scene, changes) {
+  return scene.clone(foundry.utils.deepClone(changes));
 }
 
 /**
@@ -1036,21 +1205,25 @@ function shapeBounds(s, grid, size) {
 }
 
 /**
- * Do two rectangles overlap or touch? A rectangle without size counts when it lies inside or on the edge.
+ * Do two rectangles overlap? Boxes that only touch don't, so a token next to the edge counts as outside. A point
+ * (no width or height) counts when it lies inside or on the edge.
  * @returns {boolean}
  */
 function intersects(a, b) {
-  return (a.x <= b.x + b.width) && (a.x + a.width >= b.x) && (a.y <= b.y + b.height) && (a.y + a.height >= b.y);
+  const overlaps = (start, length, otherStart, otherLength) => (length
+    ? (start < otherStart + otherLength) && (start + length > otherStart)
+    : (start >= otherStart) && (start <= otherStart + otherLength));
+  return overlaps(a.x, a.width, b.x, b.width) && overlaps(a.y, a.height, b.y, b.height);
 }
 
 /**
- * Does a line segment touch a rectangle? (Liang–Barsky clipping)
+ * The part of a line segment inside a rectangle, or null. (Liang–Barsky clipping)
  * @param {{x: number, y: number}} a
  * @param {{x: number, y: number}} b
  * @param {{x: number, y: number, width: number, height: number}} r
- * @returns {boolean}
+ * @returns {[{x: number, y: number}, {x: number, y: number}]|null}
  */
-function segmentIntersects(a, b, r) {
+function clipSegment(a, b, r) {
   const dx = b.x - a.x;
   const dy = b.y - a.y;
   let t0 = 0;
@@ -1058,27 +1231,54 @@ function segmentIntersects(a, b, r) {
   const edges = [[-dx, a.x - r.x], [dx, r.x + r.width - a.x], [-dy, a.y - r.y], [dy, r.y + r.height - a.y]];
   for ( const [p, q] of edges ) {
     if ( p === 0 ) {
-      if ( q < 0 ) return false;
+      if ( q < 0 ) return null;
       continue;
     }
     const t = q / p;
     if ( p < 0 ) t0 = Math.max(t0, t);
     else t1 = Math.min(t1, t);
-    if ( t0 > t1 ) return false;
+    if ( t0 > t1 ) return null;
   }
-  return true;
+  return [{ x: a.x + (t0 * dx), y: a.y + (t0 * dy) }, { x: a.x + (t1 * dx), y: a.y + (t1 * dy) }];
 }
+
+/**
+ * @typedef KeptLevel
+ * A Level whose images stay Level textures through a transformation, placed on the new canvas.
+ * @property {string} level         Level id.
+ * @property {string} name          Level name.
+ * @property {number} x             Anchor point of the images on the new canvas.
+ * @property {number} y
+ * @property {number} width         Size of the images on the canvas, before rotation.
+ * @property {number} height
+ * @property {number} anchorX
+ * @property {number} anchorY
+ * @property {number} rotation
+ * @property {boolean} flipped      Mirrored by a negative scale.
+ * @property {{background?: string, foreground?: string, fog?: string}} layers   Image paths.
+ */
 
 /**
  * Turn the background and foreground images of all Levels into tiles that look the same, so the image stays put
  * while the scene changes size or turns. Tiles are returned in the current canvas coordinates.
  * A Level texture is drawn like a tile with the scene rectangle's size, anchored at the rectangle's center plus the
  * texture offset, so the conversion copies anchor, fit, scale and rotation as they are.
+ *
+ * Levels with a fog overlay image keep their images as Level textures when they fill the scene ("fill" fit): the
+ * overlay copies the background's placement only while there is a Level background. Their offset, scale and
+ * rotation are changed instead, so the images stay where they are on the new canvas.
  * @param {Scene} scene
- * @returns {{tiles: object[], levels: object[]}}   Tile creation data and Level updates that clear the images.
+ * @param {TransformPlan} plan
+ * @returns {{tiles: object[], levels: object[], kept: KeptLevel[], fogLost: boolean}}
+ *   Tile creation data, Level updates (clearing converted images or moving kept ones), the kept Levels, and whether a
+ *   fog overlay can no longer follow its background.
  */
-function levelTexturesToTiles(scene) {
+function levelTexturesToTiles(scene, plan) {
   const rect = scene.dimensions.sceneRect;
+  const to = plan.rect;
+  const keepFog = (plan.keepFogLevels !== false) && !!to;
+  const kept = [];
+  let fogLost = false;
   const sorts = scene.tiles.map(t => t._source.sort);
   let minSort = Math.min(0, ...sorts);
   let maxSort = Math.max(0, ...sorts);
@@ -1093,6 +1293,28 @@ function levelTexturesToTiles(scene) {
     const bottom = src.elevation.bottom ?? 0;
     const top = src.elevation.top ?? bottom;
     const visibleIn = Array.from(new Set([level.id, ...(src.visibility?.levels ?? [])]));
+
+    if ( src.fog?.src ) {
+      if ( keepFog && ((t.fit ?? 'fill') === 'fill') ) {
+        // With "fill", the image is the scene rectangle's size times the scale: compensate the new rectangle's size
+        const p = plan.mapPoint(rect.x + (rect.width / 2) + t.offsetX, rect.y + (rect.height / 2) + t.offsetY);
+        const scaleX = t.scaleX * (rect.width / to.width);
+        const scaleY = t.scaleY * (rect.height / to.height);
+        const rotation = turn(plan, t.rotation, 'box');
+        levels.push({ _id: level.id, textures: {
+          offsetX: p.x - (to.x + (to.width / 2)), offsetY: p.y - (to.y + (to.height / 2)), scaleX, scaleY, rotation,
+        } });
+        kept.push({
+          level: level.id, name: src.name, x: p.x, y: p.y,
+          width: Math.abs(rect.width * t.scaleX), height: Math.abs(rect.height * t.scaleY),
+          anchorX: t.anchorX ?? 0.5, anchorY: t.anchorY ?? 0.5, rotation, flipped: (scaleX < 0) || (scaleY < 0),
+          layers: { background: src.background?.src, foreground: src.foreground?.src, fog: src.fog.src },
+        });
+        continue;
+      }
+      // The copies of an attached scene don't take its fog overlay along, so nothing is lost there
+      if ( plan.keepFogLevels !== false ) fogLost = true;
+    }
 
     for ( const layer of layers ) {
       const isBackground = layer === 'background';
@@ -1125,5 +1347,5 @@ function levelTexturesToTiles(scene) {
     }
     levels.push({ _id: level.id, ...Object.fromEntries(layers.map(k => [`${k}.src`, null])) });
   }
-  return { tiles, levels };
+  return { tiles, levels, kept, fogLost };
 }

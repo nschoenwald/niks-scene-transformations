@@ -1,11 +1,21 @@
 import { MODULE_ID } from './config.js';
 import { registerSceneConfigTab } from './scene-config-tab.js';
 import {
-  MIRRORS, ROTATIONS, SIDES, buildSceneUpdate, canRotate, countOutside, findBackup, planCrop, planGridSize, planMirror,
-  planPadding, planResize, planRotation, planStitch, restoreBackup, transformScene,
+  MIRRORS, ROTATIONS, SIDES, buildSceneUpdate, canExtract, canRotate, countOutside, extractGrid, extractScene,
+  findBackup, planCrop, planExtract, planGridSize, planMirror, planPadding, planResize, planRotation, planStitch,
+  restoreBackup, transformScene,
 } from './transform.js';
 
 Hooks.once('init', () => {
+  game.settings.register(MODULE_ID, 'imageFolder', {
+    name: `${MODULE_ID}.Settings.ImageFolder.Name`,
+    hint: `${MODULE_ID}.Settings.ImageFolder.Hint`,
+    scope: 'world',
+    config: true,
+    type: String,
+    default: '',
+    filePicker: 'folder',
+  });
   registerSceneConfigTab();
 
   // Public API for macros and other modules
@@ -21,6 +31,10 @@ Hooks.once('init', () => {
     planResize,
     planGridSize,
     planStitch,
+    planExtract,
+    canExtract,
+    extractGrid,
+    extractScene,
     buildSceneUpdate,
     countOutside,
     transformScene,

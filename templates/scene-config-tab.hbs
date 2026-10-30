@@ -26,6 +26,7 @@
                     <option value="rotate">{{localize "niks-scene-transformations.Mode.Rotate"}}</option>
                     <option value="grid">{{localize "niks-scene-transformations.Mode.Grid"}}</option>
                     <option value="stitch">{{localize "niks-scene-transformations.Mode.Stitch"}}</option>
+                    <option value="extract">{{localize "niks-scene-transformations.Mode.Extract"}}</option>
                 </select>
             </div>
         </div>
@@ -81,8 +82,8 @@
                     <option value="90">{{localize "niks-scene-transformations.Rotate.Clockwise"}}</option>
                     <option value="270">{{localize "niks-scene-transformations.Rotate.CounterClockwise"}}</option>
                     <option value="180">{{localize "niks-scene-transformations.Rotate.Half"}}</option>
-                    <option value="x">{{localize "niks-scene-transformations.Rotate.FlipX"}}</option>
-                    <option value="y">{{localize "niks-scene-transformations.Rotate.FlipY"}}</option>
+                    <option value="x">{{localize "niks-scene-transformations.Rotate.MirrorX"}}</option>
+                    <option value="y">{{localize "niks-scene-transformations.Rotate.MirrorY"}}</option>
                 </select>
             </div>
             <p class="hint">{{localize "niks-scene-transformations.Rotate.Hint"}}</p>
@@ -152,17 +153,78 @@
         <p class="nst-warning" data-nst-stitch-error hidden></p>
     </fieldset>
 
+    <fieldset data-nst-section="extract" hidden>
+        <legend>{{localize "niks-scene-transformations.Extract.Legend"}}</legend>
+        <p class="hint">{{localize "niks-scene-transformations.Extract.Intro"}}</p>
+        <div class="form-group">
+            <label>{{localize "niks-scene-transformations.Extract.Area"}}</label>
+            <div class="form-fields nst-sides">
+                <label>{{localize "niks-scene-transformations.Extract.Column"}}
+                    <input type="number" data-nst="exColumn" min="1" step="1"></label>
+                <label>{{localize "niks-scene-transformations.Extract.Row"}}
+                    <input type="number" data-nst="exRow" min="1" step="1"></label>
+                <label>{{localize "niks-scene-transformations.Extract.Width"}}
+                    <input type="number" data-nst="exWidth" min="1" step="1"></label>
+                <label>{{localize "niks-scene-transformations.Extract.Height"}}
+                    <input type="number" data-nst="exHeight" min="1" step="1"></label>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Extract.AreaHint"}}</p>
+        </div>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-ex-name">{{localize "niks-scene-transformations.Extract.Name"}}</label>
+            <div class="form-fields">
+                <input type="text" id="{{rootId}}-nst-ex-name" data-nst="exName">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-ex-tokens">{{localize "niks-scene-transformations.Extract.Tokens"}}</label>
+            <div class="form-fields">
+                <input type="checkbox" id="{{rootId}}-nst-ex-tokens" data-nst="exTokens" checked>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-ex-open">{{localize "niks-scene-transformations.Extract.Open"}}</label>
+            <div class="form-fields">
+                <input type="checkbox" id="{{rootId}}-nst-ex-open" data-nst="exOpen" checked>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Extract.Hint"}}</p>
+        </div>
+    </fieldset>
+
     <p class="nst-warning" data-nst-hex hidden>
-        <i class="fa-solid fa-triangle-exclamation" inert></i> {{localize "niks-scene-transformations.Error.HexRotation"}}
+        <i class="fa-solid fa-triangle-exclamation" inert></i> {{localize "niks-scene-transformations.Warning.HexModes"}}
     </p>
 
     <fieldset>
         <legend>{{localize "niks-scene-transformations.Preview.Legend"}}</legend>
         <div class="nst-preview">
             <div class="nst-preview-area">
-                <div class="nst-preview-map"><i class="fa-solid fa-arrow-up" inert></i></div>
+                <div class="nst-preview-scene"></div>
+                <div class="nst-preview-map">
+                    <i class="fa-solid fa-arrow-up" inert></i>
+                    <div class="nst-preview-cut" data-nst-cut="top"></div>
+                    <div class="nst-preview-cut" data-nst-cut="bottom"></div>
+                    <div class="nst-preview-cut" data-nst-cut="left"></div>
+                    <div class="nst-preview-cut" data-nst-cut="right"></div>
+                </div>
                 <div class="nst-preview-map nst-preview-other" hidden><i class="fa-solid fa-plus" inert></i></div>
+                <div class="nst-preview-grid" hidden></div>
+                <div class="nst-preview-select" hidden tabindex="0" role="group"
+                    aria-label="{{localize "niks-scene-transformations.Extract.Selection"}}">
+                    <span data-nst-handle="nw"></span><span data-nst-handle="n"></span><span data-nst-handle="ne"></span>
+                    <span data-nst-handle="w"></span><span data-nst-handle="e"></span>
+                    <span data-nst-handle="sw"></span><span data-nst-handle="s"></span><span data-nst-handle="se"></span>
+                </div>
             </div>
+        </div>
+        <p class="hint nst-preview-hint" data-nst-select-hint hidden>
+            <i class="fa-solid fa-hand-pointer" inert></i> {{localize "niks-scene-transformations.Extract.DragHint"}}
+        </p>
+        <p class="nst-preview-summary" data-nst-summary hidden></p>
+        <div class="nst-preview-legend" data-nst-legend hidden>
+            <span data-nst-legend="added"><span class="nst-swatch nst-swatch-added"></span>{{localize "niks-scene-transformations.Preview.Added"}}</span>
+            <span data-nst-legend="removed"><span class="nst-swatch nst-swatch-removed"></span>{{localize "niks-scene-transformations.Preview.Removed"}}</span>
+            <span><span class="nst-swatch nst-swatch-edge"></span>{{localize "niks-scene-transformations.Preview.Edge"}}</span>
         </div>
         <div class="form-group">
             <label>{{localize "niks-scene-transformations.Size.Current"}}</label>
@@ -174,7 +236,7 @@
         </div>
     </fieldset>
 
-    <fieldset>
+    <fieldset data-nst-options>
         <legend>{{localize "niks-scene-transformations.Options.Legend"}}</legend>
         <div class="form-group">
             <label for="{{rootId}}-nst-backup">{{localize "niks-scene-transformations.Options.Backup"}}</label>
@@ -194,6 +256,6 @@
 
     <button type="button" class="nst-apply" data-nst-apply>
         <i class="fa-solid fa-wand-magic-sparkles" inert></i>
-        <span>{{localize "niks-scene-transformations.Apply"}}</span>
+        <span data-nst-apply-label>{{localize "niks-scene-transformations.Apply"}}</span>
     </button>
 </div>

@@ -7,6 +7,15 @@
   --nst-map-border: var(--color-text-emphatic, var(--color-text-primary));
   --nst-map-icon: var(--color-text-primary);
   --nst-other-border: var(--color-border-highlight, var(--color-text-emphatic, var(--color-text-primary)));
+  --nst-cut-color: var(--color-level-error, #c0392b);
+  /* Hatched and darkened, so it stays visible on maps of any color */
+  --nst-cut-bg: repeating-linear-gradient(-45deg,
+    color-mix(in srgb, var(--nst-cut-color) 75%, transparent) 0 3px, transparent 3px 7px),
+    rgb(0 0 0 / 55%);
+  --nst-edge: var(--color-text-emphatic, var(--color-text-primary));
+  --nst-select: var(--color-border-highlight, #ff6400);
+  --nst-select-dim: rgb(0 0 0 / 40%);
+  --nst-grid-line: rgb(255 255 255 / 35%);
 }
 
 .scene-config .nst-tab [hidden] {
@@ -41,10 +50,59 @@
 
 .scene-config .nst-tab .nst-preview-area {
   position: relative;
+  transition: width 150ms ease, height 150ms ease;
+}
+
+/* The new scene: its background shows added space; its edge is drawn above the map */
+.scene-config .nst-tab .nst-preview-scene {
+  position: absolute;
+  background: var(--nst-area-bg);
+  transition: left 150ms ease, top 150ms ease, width 150ms ease, height 150ms ease;
+}
+
+.scene-config .nst-tab .nst-preview-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  outline: 2px dashed var(--nst-edge);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--nst-edge) 30%, transparent) inset;
+  pointer-events: none;
+}
+
+.scene-config .nst-tab .nst-preview-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  font-size: var(--font-size-12);
+  color: var(--color-form-hint);
+}
+
+.scene-config .nst-tab .nst-preview-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.scene-config .nst-tab .nst-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+}
+
+.scene-config .nst-tab .nst-swatch-added {
   background: var(--nst-area-bg);
   outline: 1px dashed var(--nst-area-border);
-  overflow: hidden; /* Parts of the map that are cut off */
-  transition: width 150ms ease, height 150ms ease;
+}
+
+.scene-config .nst-tab .nst-swatch-removed {
+  background: var(--nst-cut-bg);
+}
+
+.scene-config .nst-tab .nst-swatch-edge {
+  height: 0;
+  border-top: 2px dashed var(--nst-edge);
 }
 
 .scene-config .nst-tab .nst-preview-map {
@@ -58,7 +116,15 @@
   background-size: 100% 100%;
   background-repeat: no-repeat;
   border: 2px solid var(--nst-map-border);
+  z-index: 1;
   transition: transform 200ms ease, left 150ms ease, top 150ms ease, width 150ms ease, height 150ms ease;
+}
+
+/* Parts of the map in removed space, with the new scene edge along the part that is kept */
+.scene-config .nst-tab .nst-preview-cut {
+  position: absolute;
+  background: var(--nst-cut-bg);
+  pointer-events: none;
 }
 
 .scene-config .nst-tab .nst-preview-map.nst-preview-other {
@@ -66,11 +132,26 @@
   border-color: var(--nst-other-border);
 }
 
+.scene-config .nst-tab .nst-preview-map.rendered {
+  background-image: none !important;
+}
+
+/* The rendered map fills the map element, under the icon and the shading of removed space */
+.scene-config .nst-tab .nst-preview-render {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 .scene-config .nst-tab .nst-preview-map i {
+  position: relative;
   color: var(--nst-map-icon);
   text-shadow: 0 0 3px var(--color-shadow-dark, #000);
 }
 
+.scene-config .nst-tab .nst-preview-map.rendered i,
 .scene-config .nst-tab .nst-preview-map:not(.no-image) i {
   color: #fff;
 }
@@ -120,4 +201,72 @@
 /* The scene form's Save button doesn't apply to this tab, which works with its own button */
 .scene-config:has(.nst-tab.active) .form-footer {
   display: none;
+}
+
+/* Choosing an area to extract: grid over the map, the area outlined with the rest dimmed, handles to resize */
+.scene-config .nst-tab .nst-preview-area.nst-selecting {
+  overflow: hidden;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.scene-config .nst-tab .nst-preview-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--nst-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--nst-grid-line) 1px, transparent 1px);
+}
+
+.scene-config .nst-tab .nst-preview-select {
+  position: absolute;
+  z-index: 3;
+  box-sizing: border-box;
+  border: 2px solid var(--nst-select);
+  box-shadow: 0 0 0 100vmax var(--nst-select-dim);
+  cursor: move;
+  outline: none;
+  transition: left 80ms ease, top 80ms ease, width 80ms ease, height 80ms ease;
+}
+
+.scene-config .nst-tab .nst-preview-select:focus-visible {
+  border-style: dashed;
+  box-shadow: 0 0 0 1px #fff inset, 0 0 0 100vmax var(--nst-select-dim);
+}
+
+.scene-config .nst-tab .nst-dragging .nst-preview-select {
+  transition: none;
+}
+
+.scene-config .nst-tab [data-nst-handle] {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -6px 0 0 -6px;
+  box-sizing: border-box;
+  background: var(--nst-select);
+  border: 1px solid #fff;
+  border-radius: 2px;
+}
+
+.scene-config .nst-tab [data-nst-handle="nw"] { left: 0; top: 0; cursor: nwse-resize; }
+.scene-config .nst-tab [data-nst-handle="n"] { left: 50%; top: 0; cursor: ns-resize; }
+.scene-config .nst-tab [data-nst-handle="ne"] { left: 100%; top: 0; cursor: nesw-resize; }
+.scene-config .nst-tab [data-nst-handle="w"] { left: 0; top: 50%; cursor: ew-resize; }
+.scene-config .nst-tab [data-nst-handle="e"] { left: 100%; top: 50%; cursor: ew-resize; }
+.scene-config .nst-tab [data-nst-handle="sw"] { left: 0; top: 100%; cursor: nesw-resize; }
+.scene-config .nst-tab [data-nst-handle="s"] { left: 50%; top: 100%; cursor: ns-resize; }
+.scene-config .nst-tab [data-nst-handle="se"] { left: 100%; top: 100%; cursor: nwse-resize; }
+
+.scene-config .nst-tab .nst-preview-hint,
+.scene-config .nst-tab .nst-preview-summary {
+  margin: 0.25rem 0 0;
+  text-align: center;
+}
+
+.scene-config .nst-tab .nst-preview-summary {
+  font-variant-numeric: tabular-nums;
 }

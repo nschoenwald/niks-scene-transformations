@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Latest Release](https://img.shields.io/github/v/release/nschoenwald/niks-scene-transformations?color=purple)](https://github.com/nschoenwald/niks-scene-transformations/releases/latest)
 
-Rotate, flip, crop or extend a scene, change its grid size or attach another scene to it, without rebuilding anything. Every token, wall, door, light, sound, tile, drawing, journal note and region moves along, so everything stays exactly where it belongs on the map. Works with **any game system** in **Foundry VTT v14**.
+Rotate, mirror, crop or extend a scene, change its grid size, attach another scene to it or extract part of it into a new scene, without rebuilding anything. Every token, wall, door, light, sound, tile, drawing, journal note and region moves along, so everything stays exactly where it belongs on the map. Works with **any game system** in **Foundry VTT v14**.
 
 <img width="673" height="786" alt="image" src="https://github.com/user-attachments/assets/b71ad93d-c294-4bfa-a36a-24fa30036a88" />
 
@@ -19,16 +19,17 @@ Rotate, flip, crop or extend a scene, change its grid size or attach another sce
 - **Add or remove space**:
   - Positive numbers add empty, playable space on a side, negative numbers cut grid spaces off it. Tick **Same on all sides** to set all four at once.
   - Unlike Foundry's own padding, players can move tokens, measure and draw in added space.
-  - The background and foreground images become locked tiles in their old spot, so the map doesn't stretch.
+  - The background and foreground images become locked tiles in their old spot, so the map doesn't stretch. On scenes with a fog overlay they stay backgrounds instead, so the overlay keeps lining up (see below).
   - When removing space, **Delete what ends up outside** removes tokens, walls, lights, sounds, notes, tiles, drawings and regions that lie entirely in the removed part (the tab shows how many). Walls that cross the new edge are kept. Without it, they stay in the dark border around the scene.
-  - **Cut images to the new size** (on by default) saves the visible part of the background and foreground images as new WebP files in `worlds/<your world>/niks-scene-transformations/`, so the removed part doesn't show in the border. Videos and rotated or scaled images are kept whole, with a warning.
+  - **Cut images to the new size** (on by default) saves the visible part of the background and foreground images as new WebP files, so the removed part doesn't show in the border. Videos and rotated or scaled images are kept whole, with a warning.
+  - Cut images are named after the scene, the image and the time, for example `dungeon-ground-background-2026-10-30-232315.webp`. Where they go is set by the module setting **Folder for cut images**: leave it empty for `worlds/<your world>/niks-scene-transformations/` (or the same S3 bucket when the map is stored there), or pick your own folder, for example `assets/maps/`, so the files survive exporting the scene to another world. Module and system folders aren't used, because updating the package would delete the files.
   - On hexagonal grids the offset is rounded to whole hexes, and tokens that were snapped to the grid stay snapped.
-- **Rotate or flip the scene**:
-  - Turns the scene 90° clockwise, 90° counter-clockwise or 180°, or flips it left to right or top to bottom.
+- **Rotate or mirror the scene**:
+  - Turns the scene 90° clockwise, 90° counter-clockwise or 180°, or mirrors it left to right or top to bottom.
   - Tokens turn with the map and keep their grid spaces. Tokens with **Lock Artwork Rotation** keep their artwork upright. Tokens that are longer than they are wide (for example 2×1) swap width and height on a quarter turn.
-  - When flipping, tokens and lights turn to face the mirrored direction. Token artwork isn't mirrored, so faces and text stay readable. Tiles and the map image are mirrored. One-way walls keep blocking from the same side of the map, and doors swing the mirrored way.
+  - When mirroring, tokens and lights turn to face the mirrored direction. Token artwork isn't mirrored, so faces and text stay readable. Tiles and the map image are mirrored. One-way walls keep blocking from the same side of the map, and doors swing the mirrored way.
   - The grid stays aligned with the map, even when the scene size isn't a multiple of the grid size.
-  - On a quarter turn the background and foreground images become locked tiles turned with the map. A half turn or a flip keeps them as backgrounds.
+  - On a quarter turn the background and foreground images become locked tiles turned with the map. A half turn or a mirror keeps them as backgrounds.
 - **Change the grid size**:
   - Enter the new size of a grid space in pixels, for example 100 px for a map drawn at 200 px per grid space.
   - The map and everything on it grow or shrink with the grid, so the scene keeps the same number of grid spaces: a 30 × 30 map stays 30 × 30. Tokens keep their spaces, and lights and sounds keep their range in feet or metres.
@@ -40,13 +41,21 @@ Rotate, flip, crop or extend a scene, change its grid size or attach another sce
   - The attached scene is scaled to this scene's grid size and lined up with its grid, so its tokens land on grid spaces.
   - If the two scenes measure a grid space differently (for example 5 ft and 10 ft), light, sound, vision and wall threshold ranges are converted so they cover the same number of grid spaces.
   - Levels are matched by id, otherwise by their order from the bottom.
+- **Extract an area to a new scene**:
+  - Choose the area in the preview: drag on the map to draw it, drag it to move it, drag its handles to resize it. A grid shows the grid spaces, and the rest of the map is dimmed. You can also type column, row, width and height, or focus the area and use the arrow keys (with Shift to resize).
+  - The area always covers whole grid spaces, so the new scene's grid lines up with the map.
+  - Below the preview, the tab lists what will be copied, for example "Tokens 3 · Walls 54 · Lights 6 · Images 1".
+  - Everything overlapping the area is copied. Walls crossing the edge are cut at the edge, and the background and foreground images are cut to the area (saved like images cut by removing space). Tokens only next to the area aren't copied. **Copy tokens** can leave tokens out.
+  - The new scene takes over all settings of this one (lighting, grid, fog, sounds…), gets the name you enter and isn't added to the navigation bar. With **Open the new scene** (on by default) the window closes and the new scene opens.
+  - This scene isn't changed, so there's no confirmation and no backup copy.
 - **Undo last transformation**:
   - When a transformation kept a backup copy, the tab shows it with a **Restore** button.
   - Restoring brings back everything as it was before that transformation, including the ids of tokens and other placeables, so combats and links keep working. Anything added since is removed. The backup copy is deleted afterwards.
   - The scene keeps its name, folder, navigation and permissions. Each restore steps back one transformation, as long as backup copies are left.
-- **Preview**: Shows the new layout and the current and new size before you apply anything.
+- **Preview**: Shows the scene's actual map (background, tiles and foreground of the level it opens on), the new layout and the current and new size before you apply anything. When removing space, the whole current map stays visible: removed parts are shaded and striped, the new scene edge is a dashed line, and added space is an empty area.
+- **After applying**: The **Configure** window closes, so the transformed scene is in view right away.
 - **Safety**:
-  - **Keep a backup copy** (on by default) saves an untouched copy of the scene first, hidden from the navigation bar.
+  - **Keep a backup copy** (on by default) saves an untouched copy of the scene first, hidden from the navigation bar and named with the time it was made, for example "Dungeon (Backup 23:23)".
   - **Reset fog exploration** (on by default) clears explored areas, which no longer match the map.
   - Everything is saved in one step, so tokens don't animate, collide with walls or trigger region behaviors on the way.
   - The scene thumbnail is regenerated afterwards.
@@ -58,8 +67,8 @@ Rotate, flip, crop or extend a scene, change its grid size or attach another sce
 - **Images turned into tiles** are named after their level ("Ground Background", "Ground Foreground") and locked. Backgrounds block light and weather like a scene background does. Unlock a tile in the Tiles layer to edit it.
 - **Levels**: Scenes with several levels work. Each level's images become tiles on that level.
 - **Not supported**:
-  - Rotating, flipping or attaching scenes with a hexagonal grid (adding space and changing the grid size work).
-  - Fog overlay images aren't moved or rotated when you add space or rotate. You'll get a warning if the scene has one. Changing the grid size or flipping keeps them with the background.
+  - Rotating, mirroring, attaching or extracting from scenes with a hexagonal grid (adding space and changing the grid size work).
+  - Fog overlay images can only follow a map that is stretched to fill the scene (Foundry's default). On such scenes the map stays a background instead of becoming a tile, and when space is removed the overlay is cut together with it. Maps with another fit mode become tiles as usual, and you'll get a warning that the overlay may no longer line up. An attached scene's fog overlay isn't copied.
   - Backup copies made before version 14.2.0 can't be restored from the tab.
   - Journal note icons don't get smaller than 32 px, which is Foundry's minimum.
   - Region shapes added by other modules with their own shape types are left in place, with a warning.
@@ -73,13 +82,14 @@ The API is available on `game.modules.get("niks-scene-transformations").api` aft
 
 - `rotateScene(scene, angle, options)` rotates clockwise by 90, 180 or 270 degrees.
 - `padScene(scene, {top, right, bottom, left}, options)` adds grid spaces on each side.
-- `mirrorScene(scene, axis, options)` flips left to right (`"x"`) or top to bottom (`"y"`).
+- `mirrorScene(scene, axis, options)` mirrors left to right (`"x"`) or top to bottom (`"y"`).
 - `cropScene(scene, {top, right, bottom, left}, options)` removes grid spaces from each side. Extra options: `removeOutside = false`, `cropImages = true`.
 - `resizeGrid(scene, size, options)` changes the grid size to `size` pixels and scales everything along.
 - `stitchScenes(scene, other, {side, align, gap, offset, tokens}, options)` attaches a copy of `other`.
+- `extractScene(scene, {x, y, width, height}, {name, tokens})` creates a new scene from an area in grid spaces (columns and rows from 0, see `extractGrid(scene)`) and returns `{scene, warnings}`.
 - `options`: `{backup = false, resetFog = true, thumbnail = true}`. All of these return `{scene, backup, warnings}`.
 - `findBackup(scene)` returns the latest backup copy, and `restoreBackup(scene, backup, {resetFog, thumbnail})` restores it.
-- `planRotation(scene, angle)`, `planMirror(scene, axis)`, `planPadding(scene, padding)`, `planCrop(scene, crop, options)`, `planResize(scene, amounts, options)` (signed amounts), `planGridSize(scene, size)`, `planStitch(scene, other, placement)`, `countOutside(scene, plan)` and `buildSceneUpdate(scene, plan)` build the Scene update without saving it, for previews or custom workflows. `transformScene(scene, plan, options)` applies a plan.
+- `planRotation(scene, angle)`, `planMirror(scene, axis)`, `planPadding(scene, padding)`, `planCrop(scene, crop, options)`, `planResize(scene, amounts, options)` (signed amounts), `planGridSize(scene, size)`, `planStitch(scene, other, placement)`, `planExtract(scene, area, {tokens})`, `countOutside(scene, plan)` and `buildSceneUpdate(scene, plan)` build the Scene update without saving it, for previews or custom workflows. `transformScene(scene, plan, options)` applies a plan.
 - The Scene update carries the option `{"niks-scene-transformations": {type, angle, mirror}}` (`type: "restore"` when restoring), so `preUpdateScene` / `updateScene` hooks can tell a transformation apart.
 
 ---

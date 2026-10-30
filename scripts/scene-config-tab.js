@@ -1,8 +1,10 @@
 import { MODULE_ID, TAB_ID, loc } from './config.js';
 import {
-  MIRRORS, TransformError, canRotate, countOutside, findBackup, gridStep, planGridSize, planMirror, planResize,
-  planRotation, planStitch, restoreBackup, transformScene,
+  MIRRORS, TransformError, buildSceneUpdate, canExtract, canRotate, countOutside, extractScene, findBackup,
+  gridStep, planExtract, planGridSize, planMirror, planResize, planRotation, planStitch, restoreBackup, transformScene,
 } from './transform.js';
+import { readArea, renderAreaSelection, wireAreaSelector } from './area-selector.js';
+import { attachRender } from './scene-render.js';
 
 /**
  * The "Transform" tab of Scene Configuration.
@@ -49,6 +51,8 @@ function onRenderSceneConfig(app, element) {
     tab.querySelector('[data-nst="mode"] option[value="rotate"]').disabled = true;
     tab.querySelector('[data-nst-hex]').hidden = false;
   }
+  if ( !canExtract(scene) ) tab.querySelector('[data-nst="mode"] option[value="extract"]').disabled = true;
+  field(tab, 'exName').value = game.i18n.format(`${MODULE_ID}.Extract.DefaultName`, { name: scene.name });
   const gridSize = field(tab, 'gridSize');
   gridSize.min = CONST.GRID_MIN_SIZE;
   gridSize.value = scene._source.grid.size;
@@ -72,10 +76,11 @@ function onRenderSceneConfig(app, element) {
       name: backup.name, time: new Date(time).toLocaleString(game.i18n.lang),
     });
     tab.querySelector('[data-nst-restore-button]').addEventListener('click',
-      event => restore(scene, backup, tab, event.currentTarget));
+      event => restore(app, backup, tab, event.currentTarget));
   }
 
   const updateOutside = foundry.utils.debounce(() => refreshOutside(tab, scene), 200);
+  const updateSummary = foundry.utils.debounce(() => refreshSummary(tab, scene), 200);
   const onChange = event => {
     event.stopPropagation();
     const side = event.target.dataset.nst;
@@ -84,15 +89,23 @@ function onRenderSceneConfig(app, element) {
     }
     refresh(tab, scene);
     updateOutside();
+    updateSummary();
   };
+  if ( canExtract(scene) ) {
+    wireAreaSelector(tab, scene, () => {
+      refresh(tab, scene);
+      updateSummary();
+    });
+  }
   tab.addEventListener('change', onChange);
   tab.addEventListener('input', onChange);
   tab.addEventListener('keydown', event => {
     if ( (event.key === 'Enter') && (event.target.tagName === 'INPUT') ) event.preventDefault();
   });
-  tab.querySelector('[data-nst-apply]').addEventListener('click', event => apply(scene, tab, event.currentTarget));
+  tab.querySelector('[data-nst-apply]').addEventListener('click', event => apply(app, tab, event.currentTarget));
 
   refresh(tab, scene);
+  updateSummary();
 }
 
 /**
@@ -127,6 +140,12 @@ function readState(tab) {
       offset: int('offset'),
       tokens: field(tab, 'tokens').checked,
     },
+    extract: {
+      area: readArea(tab),
+      name: field(tab, 'exName').value,
+      tokens: field(tab, 'exTokens').checked,
+      open: field(tab, 'exOpen').checked,
+    },
     backup: field(tab, 'backup').checked,
     resetFog: field(tab, 'resetFog').checked,
   };
@@ -143,6 +162,7 @@ function buildPlan(scene, state) {
     case 'rotate': return state.mirror ? planMirror(scene, state.mirror) : planRotation(scene, state.angle);
     case 'grid': return planGridSize(scene, state.gridSize);
     case 'stitch': return planStitch(scene, state.other, state.stitch);
+    case 'extract': return planExtract(scene, state.extract.area, { tokens: state.extract.tokens });
     default: return planResize(scene, state.padding,
       { removeOutside: state.removeOutside, cropImages: state.cropImages });
   }
@@ -162,6 +182,10 @@ function refresh(tab, scene) {
     section.hidden = section.dataset.nstSection !== state.mode;
   }
   tab.querySelector('[data-nst-crop]').hidden = !crops(state);
+  const extracting = state.mode === 'extract';
+  // Extracting leaves this scene as it is, so backup and fog options don't apply
+  tab.querySelector('[data-nst-options]').hidden = extracting;
+  tab.querySelector('[data-nst-apply-label]').textContent = loc(extracting ? 'Extract.Create' : 'Apply');
 
   const { width: W, height: H } = scene._source;
   const step = gridStep(scene.grid);
@@ -219,6 +243,17 @@ function refresh(tab, scene) {
         stitchError.hidden = false;
       }
     }
+  } else if ( extracting ) {
+    valid = false;
+    if ( canExtract(scene) ) {
+      try {
+        const plan = planExtract(scene, state.extract.area);
+        ({ width, height } = plan.changes);
+        valid = true;
+      } catch(err) {
+        if ( !(err instanceof TransformError) ) throw err;
+      }
+    }
   } else {
     const p = state.padding;
     left = Math.round(p.left * step.x);
@@ -229,28 +264,75 @@ function refresh(tab, scene) {
     if ( !valid ) [width, height, left, top] = [W, H, 0, 0];
   }
 
-  // Preview: the new scene area, with the current map (and an attached scene) placed inside it. Parts of the map
-  // that are cut off fall outside the area and are clipped.
-  scale ??= Math.min(PREVIEW.width / width, PREVIEW.height / height);
+  // Preview: the new scene, with the current map (and an attached scene) placed on it. The preview covers both the
+  // new scene and the current map, so space that is removed stays visible, shaded, outside the new scene's edge.
+  const mapRect = { x: left, y: top, width: mapW, height: mapH };
+  const bounds = state.mode === 'pad' ? {
+    x: Math.min(0, left), y: Math.min(0, top),
+    right: Math.max(width, left + W), bottom: Math.max(height, top + H),
+  } : { x: 0, y: 0, right: extracting ? W : width, bottom: extracting ? H : height };
+  const areaW = bounds.right - bounds.x;
+  const areaH = bounds.bottom - bounds.y;
+  scale ??= Math.min(PREVIEW.width / areaW, PREVIEW.height / areaH);
   const area = tab.querySelector('.nst-preview-area');
-  area.style.width = `${Math.round(width * scale)}px`;
-  area.style.height = `${Math.round(height * scale)}px`;
-  const place = (rect, el, src) => {
+  area.style.width = `${Math.round(areaW * scale)}px`;
+  area.style.height = `${Math.round(areaH * scale)}px`;
+  const position = (el, rect, outer = { x: bounds.x, y: bounds.y, width: areaW, height: areaH }) => {
     Object.assign(el.style, {
-      left: `${(rect.x / width) * 100}%`,
-      top: `${(rect.y / height) * 100}%`,
-      width: `${(rect.width / width) * 100}%`,
-      height: `${(rect.height / height) * 100}%`,
+      left: `${((rect.x - outer.x) / outer.width) * 100}%`,
+      top: `${((rect.y - outer.y) / outer.height) * 100}%`,
+      width: `${(rect.width / outer.width) * 100}%`,
+      height: `${(rect.height / outer.height) * 100}%`,
     });
+  };
+  const place = (el, rect, src) => {
+    position(el, rect);
     el.style.backgroundImage = src ? `url(${JSON.stringify(src)})` : '';
     el.classList.toggle('no-image', !src);
   };
+  position(tab.querySelector('.nst-preview-scene'), { x: 0, y: 0, width, height });
   const map = tab.querySelector('.nst-preview-map:not(.nst-preview-other)');
-  place({ x: left, y: top, width: mapW, height: mapH }, map, previewImage(scene));
+  // The background image shows right away; the rendered map with its tiles replaces it once ready
+  place(map, mapRect, previewImage(scene));
+  attachRender(map, scene);
   map.style.transform = transform;
   const otherMap = tab.querySelector('.nst-preview-other');
   otherMap.hidden = !otherRect;
-  if ( otherRect ) place(otherRect, otherMap, previewImage(state.other));
+  if ( otherRect ) {
+    place(otherMap, otherRect, previewImage(state.other));
+    attachRender(otherMap, state.other);
+  }
+
+  // Shade the parts of the map outside the new scene: up to four strips around the part that is kept
+  const removing = (state.mode === 'pad') && valid && crops(state);
+  const keep = {
+    x: Math.max(0, -left), y: Math.max(0, -top),
+    right: Math.min(W, width - left), bottom: Math.min(H, height - top),
+  };
+  const strips = {
+    top: { x: 0, y: 0, width: W, height: keep.y },
+    bottom: { x: 0, y: keep.bottom, width: W, height: H - keep.bottom },
+    left: { x: 0, y: keep.y, width: keep.x, height: keep.bottom - keep.y },
+    right: { x: keep.right, y: keep.y, width: W - keep.right, height: keep.bottom - keep.y },
+  };
+  for ( const strip of tab.querySelectorAll('[data-nst-cut]') ) {
+    const rect = strips[strip.dataset.nstCut];
+    strip.hidden = !removing || (rect.width <= 0) || (rect.height <= 0);
+    if ( !strip.hidden ) position(strip, rect, { x: 0, y: 0, width: W, height: H });
+  }
+  // Choosing the area to extract: the preview shows the whole scene with a grid and the selected area
+  area.classList.toggle('nst-selecting', extracting);
+  tab.querySelector('.nst-preview-select').hidden = !extracting;
+  tab.querySelector('[data-nst-select-hint]').hidden = !extracting;
+  if ( extracting ) {
+    position(tab.querySelector('.nst-preview-scene'), { x: 0, y: 0, width: W, height: H });
+    renderAreaSelection(tab, scene, state.extract.area, scale);
+  } else tab.querySelector('.nst-preview-grid').hidden = true;
+
+  const adding = (state.mode === 'pad') && valid && SIDES.some(s => state.padding[s] > 0);
+  tab.querySelector('[data-nst-legend]').hidden = !removing && !adding;
+  tab.querySelector('[data-nst-legend="added"]').hidden = !adding;
+  tab.querySelector('[data-nst-legend="removed"]').hidden = !removing;
 
   const describe = (w, h, s) => game.i18n.format(`${MODULE_ID}.Size.Value`, {
     width: w, height: h, columns: Math.round(w / s.x), rows: Math.round(h / s.y),
@@ -279,6 +361,43 @@ function refreshOutside(tab, scene) {
   }
   output.textContent = count ? game.i18n.format(`${MODULE_ID}.Crop.OutsideCount`, { count }) : '';
 }
+
+/**
+ * List what an extracted area would contain, below the preview.
+ * @param {HTMLElement} tab
+ * @param {Scene} scene
+ */
+function refreshSummary(tab, scene) {
+  const output = tab.querySelector('[data-nst-summary]');
+  if ( !output?.isConnected ) return;
+  const state = readState(tab);
+  output.hidden = state.mode !== 'extract';
+  if ( output.hidden ) return;
+  let update;
+  try {
+    ({ update } = buildSceneUpdate(scene, planExtract(scene, state.extract.area, { tokens: state.extract.tokens })));
+  } catch(err) {
+    if ( !(err instanceof TransformError) ) throw err;
+    output.hidden = true;
+    return;
+  }
+  const parts = [];
+  for ( const [documentName, collection] of Object.entries(SUMMARY) ) {
+    const count = (update[collection] ?? []).filter(d => d._id).length;
+    if ( count ) parts.push(`${game.i18n.localize(getDocumentClass(documentName).metadata.labelPlural)} ${count}`);
+  }
+  const images = (update.tiles ?? []).filter(d => !d._id).length;
+  if ( images ) parts.push(`${loc('Extract.Images')} ${images}`);
+  output.textContent = parts.length
+    ? game.i18n.format(`${MODULE_ID}.Extract.Summary`, { list: parts.join(' · ') })
+    : loc('Extract.Empty');
+}
+
+/** Placeables listed in the extract summary, by Document name. */
+const SUMMARY = {
+  Token: 'tokens', Wall: 'walls', AmbientLight: 'lights', AmbientSound: 'sounds', Tile: 'tiles', Drawing: 'drawings',
+  Note: 'notes', Region: 'regions',
+};
 
 /**
  * The background image of the Level the scene opens on, unless it is a video.
@@ -310,13 +429,15 @@ function confirmText(plan, state) {
 }
 
 /**
- * Confirm and run the transformation.
- * @param {Scene} scene
+ * Confirm and run the transformation, then close the window so the transformed scene can be seen.
+ * @param {SceneConfig} app
  * @param {HTMLElement} tab
  * @param {HTMLButtonElement} button
  */
-async function apply(scene, tab, button) {
+async function apply(app, tab, button) {
+  const scene = app.document;
   const state = readState(tab);
+  if ( state.mode === 'extract' ) return extract(app, state, button);
   let plan;
   try {
     plan = buildPlan(scene, state);
@@ -343,6 +464,7 @@ async function apply(scene, tab, button) {
   button.disabled = true;
   try {
     const result = await transformScene(scene, plan, { backup: state.backup, resetFog: state.resetFog });
+    await app.close();
     ui.notifications.info(game.i18n.format(`${MODULE_ID}.Notify.Success`, { name: scene.name }));
     if ( result.backup ) {
       ui.notifications.info(game.i18n.format(`${MODULE_ID}.Notify.Backup`, { name: result.backup.name }));
@@ -358,13 +480,42 @@ async function apply(scene, tab, button) {
 }
 
 /**
- * Confirm and restore the scene from its latest backup copy.
- * @param {Scene} scene
+ * Create a new scene from the selected area. Nothing is changed here, so there's no confirmation; the window closes
+ * only when the new scene is opened.
+ * @param {SceneConfig} app
+ * @param {ReturnType<readState>} state
+ * @param {HTMLButtonElement} button
+ */
+async function extract(app, state, button) {
+  const scene = app.document;
+  const { area, name, tokens, open } = state.extract;
+  button.disabled = true;
+  try {
+    const result = await extractScene(scene, area, { name, tokens });
+    ui.notifications.info(game.i18n.format(`${MODULE_ID}.Notify.Extracted`, { name: result.scene.name }));
+    for ( const warning of result.warnings ) ui.notifications.warn(warning);
+    if ( open ) {
+      await app.close();
+      await result.scene.view();
+    }
+  } catch(err) {
+    console.error(`${MODULE_ID} | Extracting an area of scene "${scene.name}" failed.`, err);
+    ui.notifications.error(err instanceof TransformError ? err.message
+      : game.i18n.format(`${MODULE_ID}.Error.ExtractFailed`, { error: err.message }));
+  } finally {
+    if ( button.isConnected ) button.disabled = false;
+  }
+}
+
+/**
+ * Confirm and restore the scene from its latest backup copy, then close the window.
+ * @param {SceneConfig} app
  * @param {Scene} backup
  * @param {HTMLElement} tab
  * @param {HTMLButtonElement} button
  */
-async function restore(scene, backup, tab, button) {
+async function restore(app, backup, tab, button) {
+  const scene = app.document;
   const name = foundry.utils.escapeHTML(backup.name);
   const confirmed = await foundry.applications.api.DialogV2.confirm({
     window: { title: 'niks-scene-transformations.Restore.Legend', icon: 'fa-solid fa-clock-rotate-left' },
@@ -377,6 +528,7 @@ async function restore(scene, backup, tab, button) {
   button.disabled = true;
   try {
     await restoreBackup(scene, backup, { resetFog: field(tab, 'resetFog').checked });
+    await app.close();
     ui.notifications.info(game.i18n.format(`${MODULE_ID}.Notify.Restored`, { name: scene.name }));
   } catch(err) {
     console.error(`${MODULE_ID} | Restoring scene "${scene.name}" failed.`, err);
