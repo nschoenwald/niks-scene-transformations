@@ -1,6 +1,21 @@
 <div class="tab scrollable nst-tab{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <p class="hint">{{localize "niks-scene-transformations.Tab.Intro"}}</p>
 
+    <fieldset data-nst-restore hidden>
+        <legend>{{localize "niks-scene-transformations.Restore.Legend"}}</legend>
+        <div class="form-group">
+            <label>{{localize "niks-scene-transformations.Restore.Label"}}</label>
+            <div class="form-fields">
+                <span data-nst-backup-info></span>
+                <button type="button" class="nst-restore" data-nst-restore-button>
+                    <i class="fa-solid fa-clock-rotate-left" inert></i>
+                    <span>{{localize "niks-scene-transformations.Restore.Button"}}</span>
+                </button>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Restore.Hint"}}</p>
+        </div>
+    </fieldset>
+
     <fieldset>
         <legend>{{localize "niks-scene-transformations.Mode.Legend"}}</legend>
         <div class="form-group">
@@ -10,6 +25,7 @@
                     <option value="pad">{{localize "niks-scene-transformations.Mode.Pad"}}</option>
                     <option value="rotate">{{localize "niks-scene-transformations.Mode.Rotate"}}</option>
                     <option value="grid">{{localize "niks-scene-transformations.Mode.Grid"}}</option>
+                    <option value="stitch">{{localize "niks-scene-transformations.Mode.Stitch"}}</option>
                 </select>
             </div>
         </div>
@@ -27,15 +43,32 @@
             <label>{{localize "niks-scene-transformations.Pad.Amount"}}</label>
             <div class="form-fields nst-sides">
                 <label>{{localize "niks-scene-transformations.Pad.Top"}}
-                    <input type="number" data-nst="top" value="0" min="0" step="1"></label>
+                    <input type="number" data-nst="top" value="0" step="1"></label>
                 <label>{{localize "niks-scene-transformations.Pad.Right"}}
-                    <input type="number" data-nst="right" value="0" min="0" step="1"></label>
+                    <input type="number" data-nst="right" value="0" step="1"></label>
                 <label>{{localize "niks-scene-transformations.Pad.Bottom"}}
-                    <input type="number" data-nst="bottom" value="0" min="0" step="1"></label>
+                    <input type="number" data-nst="bottom" value="0" step="1"></label>
                 <label>{{localize "niks-scene-transformations.Pad.Left"}}
-                    <input type="number" data-nst="left" value="0" min="0" step="1"></label>
+                    <input type="number" data-nst="left" value="0" step="1"></label>
             </div>
             <p class="hint">{{localize "niks-scene-transformations.Pad.Hint"}}</p>
+        </div>
+        <div data-nst-crop hidden>
+            <div class="form-group">
+                <label for="{{rootId}}-nst-remove">{{localize "niks-scene-transformations.Crop.RemoveOutside"}}</label>
+                <div class="form-fields">
+                    <input type="checkbox" id="{{rootId}}-nst-remove" data-nst="removeOutside">
+                </div>
+                <p class="hint">{{localize "niks-scene-transformations.Crop.RemoveOutsideHint"}}
+                    <strong data-nst-outside></strong></p>
+            </div>
+            <div class="form-group">
+                <label for="{{rootId}}-nst-crop-images">{{localize "niks-scene-transformations.Crop.Images"}}</label>
+                <div class="form-fields">
+                    <input type="checkbox" id="{{rootId}}-nst-crop-images" data-nst="cropImages" checked>
+                </div>
+                <p class="hint">{{localize "niks-scene-transformations.Crop.ImagesHint"}}</p>
+            </div>
         </div>
     </fieldset>
 
@@ -48,6 +81,8 @@
                     <option value="90">{{localize "niks-scene-transformations.Rotate.Clockwise"}}</option>
                     <option value="270">{{localize "niks-scene-transformations.Rotate.CounterClockwise"}}</option>
                     <option value="180">{{localize "niks-scene-transformations.Rotate.Half"}}</option>
+                    <option value="x">{{localize "niks-scene-transformations.Rotate.FlipX"}}</option>
+                    <option value="y">{{localize "niks-scene-transformations.Rotate.FlipY"}}</option>
                 </select>
             </div>
             <p class="hint">{{localize "niks-scene-transformations.Rotate.Hint"}}</p>
@@ -65,6 +100,58 @@
             <p class="hint">{{localize "niks-scene-transformations.Grid.Hint"}}</p>
         </div>
     </fieldset>
+
+    <fieldset data-nst-section="stitch" hidden>
+        <legend>{{localize "niks-scene-transformations.Stitch.Legend"}}</legend>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-other">{{localize "niks-scene-transformations.Stitch.Scene"}}</label>
+            <div class="form-fields">
+                <select id="{{rootId}}-nst-other" data-nst="other">
+                    <option value="">{{localize "niks-scene-transformations.Stitch.Choose"}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-side">{{localize "niks-scene-transformations.Stitch.Side"}}</label>
+            <div class="form-fields">
+                <select id="{{rootId}}-nst-side" data-nst="side">
+                    <option value="right">{{localize "niks-scene-transformations.Pad.Right"}}</option>
+                    <option value="bottom">{{localize "niks-scene-transformations.Pad.Bottom"}}</option>
+                    <option value="left">{{localize "niks-scene-transformations.Pad.Left"}}</option>
+                    <option value="top">{{localize "niks-scene-transformations.Pad.Top"}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-align">{{localize "niks-scene-transformations.Stitch.Align"}}</label>
+            <div class="form-fields">
+                <select id="{{rootId}}-nst-align" data-nst="align">
+                    <option value="start">{{localize "niks-scene-transformations.Stitch.Start"}}</option>
+                    <option value="center">{{localize "niks-scene-transformations.Stitch.Center"}}</option>
+                    <option value="end">{{localize "niks-scene-transformations.Stitch.End"}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>{{localize "niks-scene-transformations.Stitch.Spacing"}}</label>
+            <div class="form-fields nst-sides nst-sides-2">
+                <label>{{localize "niks-scene-transformations.Stitch.Gap"}}
+                    <input type="number" data-nst="gap" value="0" min="0" step="1"></label>
+                <label>{{localize "niks-scene-transformations.Stitch.Offset"}}
+                    <input type="number" data-nst="offset" value="0" step="1"></label>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Stitch.SpacingHint"}}</p>
+        </div>
+        <div class="form-group">
+            <label for="{{rootId}}-nst-tokens">{{localize "niks-scene-transformations.Stitch.Tokens"}}</label>
+            <div class="form-fields">
+                <input type="checkbox" id="{{rootId}}-nst-tokens" data-nst="tokens" checked>
+            </div>
+            <p class="hint">{{localize "niks-scene-transformations.Stitch.Hint"}}</p>
+        </div>
+        <p class="nst-warning" data-nst-stitch-error hidden></p>
+    </fieldset>
+
     <p class="nst-warning" data-nst-hex hidden>
         <i class="fa-solid fa-triangle-exclamation" inert></i> {{localize "niks-scene-transformations.Error.HexRotation"}}
     </p>
@@ -74,6 +161,7 @@
         <div class="nst-preview">
             <div class="nst-preview-area">
                 <div class="nst-preview-map"><i class="fa-solid fa-arrow-up" inert></i></div>
+                <div class="nst-preview-map nst-preview-other" hidden><i class="fa-solid fa-plus" inert></i></div>
             </div>
         </div>
         <div class="form-group">

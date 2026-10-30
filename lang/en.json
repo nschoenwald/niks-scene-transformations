@@ -2,38 +2,64 @@
   "niks-scene-transformations": {
     "Tab": {
       "Label": "Transform",
-      "Intro": "Rotate the scene, add playable space around it or change its grid size. Tokens, walls, doors, lights, sounds, tiles, drawings, notes and regions move along, so everything stays where it belongs on the map. Changes are saved right away."
+      "Intro": "Add or remove space, rotate or flip the scene, change its grid size or attach another scene. Tokens, walls, doors, lights, sounds, tiles, drawings, notes and regions move along, so everything stays where it belongs on the map. Changes are saved right away."
     },
     "Mode": {
       "Legend": "Transformation",
       "Label": "Type",
-      "Pad": "Add space around the scene",
-      "Rotate": "Rotate the scene",
-      "Grid": "Change the grid size"
+      "Pad": "Add or remove space",
+      "Rotate": "Rotate or flip the scene",
+      "Grid": "Change the grid size",
+      "Stitch": "Attach another scene"
     },
     "Pad": {
-      "Legend": "Add Space",
+      "Legend": "Add or Remove Space",
       "Linked": "Same on all sides",
       "Amount": "Grid spaces",
       "Top": "Top",
       "Right": "Right",
       "Bottom": "Bottom",
       "Left": "Left",
-      "Hint": "The scene grows by this many grid spaces on each side. Unlike Foundry's padding, players can move into the new space. Background and foreground images become locked tiles, so the map stays where it is."
+      "Hint": "Positive numbers add this many grid spaces on a side, negative numbers remove them. Unlike Foundry's padding, players can move into added space. Background and foreground images become locked tiles, so the map stays where it is."
+    },
+    "Crop": {
+      "RemoveOutside": "Delete what ends up outside",
+      "RemoveOutsideHint": "Deletes tokens, walls, lights, sounds, notes, tiles, drawings and regions entirely in the removed space. Otherwise they stay in the dark border around the scene.",
+      "OutsideCount": "{count} would be deleted.",
+      "Images": "Cut images to the new size",
+      "ImagesHint": "Saves the visible part of the background and foreground images as new files in the world folder, so the removed part doesn't show in the border around the scene."
     },
     "Rotate": {
-      "Legend": "Rotate",
-      "Direction": "Direction",
+      "Legend": "Rotate or Flip",
+      "Direction": "Turn",
       "Clockwise": "90° clockwise",
       "CounterClockwise": "90° counter-clockwise",
       "Half": "180°",
-      "Hint": "On a quarter turn, background and foreground images become locked tiles turned with the map. A half turn keeps them as backgrounds."
+      "Hint": "On a quarter turn, background and foreground images become locked tiles turned with the map. A half turn or a flip keeps them as backgrounds. Flipping turns tokens to face the mirrored way without mirroring their artwork.",
+      "FlipX": "Flip left to right",
+      "FlipY": "Flip top to bottom"
     },
     "Grid": {
       "Legend": "Grid Size",
       "Size": "New grid size",
       "Units": "px",
       "Hint": "The size of one grid space in pixels. The map and everything on it grow or shrink with the grid, so the scene keeps the same number of grid spaces, for example 30 × 30 at 200 px becomes 30 × 30 at 100 px."
+    },
+    "Stitch": {
+      "Legend": "Attach Another Scene",
+      "Scene": "Scene to attach",
+      "Choose": "Choose a scene…",
+      "Side": "Side",
+      "Align": "Alignment",
+      "Start": "Top or left edges",
+      "Center": "Centered",
+      "End": "Bottom or right edges",
+      "Spacing": "Spacing",
+      "Gap": "Gap",
+      "Offset": "Shift along the side",
+      "SpacingHint": "In grid spaces. The gap leaves empty space between the two maps; the shift moves the attached map along the side, negative numbers toward the top or left.",
+      "Tokens": "Copy its tokens",
+      "Hint": "This scene grows to fit both maps. The other scene's map, walls, lights, sounds, notes, tiles, drawings, regions and, if ticked, tokens are copied in, scaled to this scene's grid size. The other scene isn't changed."
     },
     "Preview": {
       "Legend": "Preview"
@@ -57,11 +83,17 @@
       "Pad": "Add space around this scene and move everything on it?",
       "Unsaved": "This saves immediately. Unsaved changes in other tabs of this window will be lost.",
       "NoBackup": "<strong>No backup copy will be made.</strong>",
-      "Grid": "Change the grid size of this scene and scale everything on it?"
+      "Grid": "Change the grid size of this scene and scale everything on it?",
+      "Mirror": "Flip this scene and everything on it?",
+      "Crop": "Change the space around this scene and move everything on it?",
+      "Stitch": "Attach a copy of \"{name}\" to this scene?",
+      "Delete": "<strong>{count} placeables in the removed space will be deleted.</strong>",
+      "Restore": "Restore this scene from \"{name}\"? The backup copy is deleted afterwards."
     },
     "Notify": {
       "Success": "Transformed scene \"{name}\".",
-      "Backup": "Saved a backup copy as \"{name}\"."
+      "Backup": "Saved a backup copy as \"{name}\".",
+      "Restored": "Restored scene \"{name}\" from its backup copy."
     },
     "Backup": {
       "Name": "{name} (Backup)"
@@ -72,17 +104,34 @@
     },
     "Warning": {
       "FogOverlay": "This scene has a fog overlay image. It isn't moved or rotated with the map.",
-      "UnknownShape": "A region shape of type \"{type}\" isn't supported and was left in place."
+      "UnknownShape": "A region shape of type \"{type}\" isn't supported and was left in place.",
+      "CropFailed": "The image of \"{name}\" couldn't be cut and was kept whole."
     },
     "Error": {
       "InvalidAngle": "Scenes can only be rotated by 90, 180 or 270 degrees.",
-      "HexRotation": "Scenes with a hexagonal grid can't be rotated.",
-      "InvalidPadding": "Space must be given in whole grid spaces of 0 or more.",
-      "NoPadding": "Enter how many grid spaces to add on at least one side.",
+      "HexRotation": "Scenes with a hexagonal grid can't be rotated or flipped.",
+      "InvalidPadding": "Space must be given in whole grid spaces.",
+      "NoPadding": "Enter how many grid spaces to add or remove on at least one side.",
       "NotGM": "Only a Gamemaster can transform scenes.",
       "Failed": "Transforming the scene failed: {error}",
       "InvalidGridSize": "The grid size must be a whole number of pixels, {min} or more.",
-      "SameGridSize": "Enter a grid size different from the current one."
+      "SameGridSize": "Enter a grid size different from the current one.",
+      "TooSmall": "The scene would be smaller than one grid space.",
+      "InvalidMirror": "Scenes can only be flipped left to right or top to bottom.",
+      "StitchSame": "Choose another scene to attach.",
+      "StitchSide": "Choose the side to attach the scene to.",
+      "StitchHex": "Scenes with a hexagonal grid can't be attached or attached to.",
+      "StitchGap": "Gap and shift must be whole grid spaces, and the gap 0 or more.",
+      "NoBackup": "This scene has no backup copy to restore.",
+      "Upload": "The image couldn't be saved.",
+      "RestoreFailed": "Restoring the scene failed: {error}"
+    },
+    "Restore": {
+      "Legend": "Undo Last Transformation",
+      "Label": "Backup copy",
+      "Info": "\"{name}\" from {time}",
+      "Button": "Restore",
+      "Hint": "Brings this scene back to how it was before the last transformation that kept a backup copy, then deletes that copy. Tokens and other placeables get their old ids back, and anything added since is removed."
     }
   }
 }
