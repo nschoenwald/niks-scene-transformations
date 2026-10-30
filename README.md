@@ -7,7 +7,7 @@
 
 Rotate a scene or give it more room, without rebuilding anything. Every token, wall, door, light, sound, tile, drawing, journal note and region moves along, so everything stays exactly where it belongs on the map. Works with **any game system** in **Foundry VTT v14**.
 
-<img width="670" height="784" alt="image" src="https://github.com/user-attachments/assets/79c53d2f-37d4-4206-b0d9-e44c2daab889" />
+<img width="673" height="786" alt="image" src="https://github.com/user-attachments/assets/b71ad93d-c294-4bfa-a36a-24fa30036a88" />
 
 <img width="672" height="780" alt="image" src="https://github.com/user-attachments/assets/19283486-edcb-4808-80b1-e3c8ea346c9d" />
 
