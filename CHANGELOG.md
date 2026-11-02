@@ -2,6 +2,10 @@
 
 All notable changes to **Nik's Scene Transformations (`niks-scene-transformations`)** are documented in this file.
 
+## [14.4.0] - 2026-11-02
+### Added
+- The module is now available in German, French, Spanish, Italian, Brazilian Portuguese, Japanese, Polish and Czech.
+
 ## [14.3.0] - 2026-10-30
 ### Added
 - **Extract an Area to a New Scene**: Creates a new scene from part of the current one, for example a single building from a city map. Drag on the map preview to choose the area, move it or resize it by its handles; it snaps to grid spaces, and you can also type it in or use the arrow keys. The tab shows what will be copied. Walls are cut at the edge, the map image is cut to the area, and all scene settings are taken over. The current scene isn't changed.

@@ -1,0 +1,174 @@
+{
+  "niks-scene-transformations": {
+    "Tab": {
+      "Label": "Transformar",
+      "Intro": "Adicione ou remova espaço, gire ou espelhe a cena, mude o tamanho da grade, anexe outra cena ou extraia uma área para uma nova cena. Tokens, paredes, portas, luzes, sons, tiles, desenhos, notas e regiões acompanham, então tudo fica no seu lugar no mapa. As alterações são salvas imediatamente."
+    },
+    "Mode": {
+      "Legend": "Transformação",
+      "Label": "Tipo",
+      "Pad": "Adicionar ou remover espaço",
+      "Rotate": "Girar ou espelhar a cena",
+      "Grid": "Mudar o tamanho da grade",
+      "Stitch": "Anexar outra cena",
+      "Extract": "Extrair uma área para uma nova cena"
+    },
+    "Pad": {
+      "Legend": "Adicionar ou remover espaço",
+      "Linked": "Igual em todos os lados",
+      "Amount": "Espaços da grade",
+      "Top": "Topo",
+      "Right": "Direita",
+      "Bottom": "Base",
+      "Left": "Esquerda",
+      "Hint": "Números positivos adicionam essa quantidade de espaços em um lado; negativos removem. Diferente da margem do Foundry, os jogadores podem se mover no espaço adicionado. Imagens de fundo e primeiro plano viram tiles bloqueados, para que o mapa fique onde está."
+    },
+    "Crop": {
+      "RemoveOutside": "Excluir o que ficar de fora",
+      "RemoveOutsideHint": "Exclui tokens, paredes, luzes, sons, notas, tiles, desenhos e regiões que ficarem totalmente no espaço removido. Caso contrário, eles ficam na borda escura em volta da cena.",
+      "OutsideCount": "{count} seriam excluídos.",
+      "Images": "Recortar as imagens no novo tamanho",
+      "ImagesHint": "Salva a parte visível das imagens de fundo e primeiro plano como novos arquivos (veja a configuração do módulo \"Pasta para imagens recortadas\"), para que a parte removida não apareça na borda em volta da cena."
+    },
+    "Rotate": {
+      "Legend": "Girar ou espelhar",
+      "Direction": "Giro",
+      "Clockwise": "90° no sentido horário",
+      "CounterClockwise": "90° no sentido anti-horário",
+      "Half": "180°",
+      "Hint": "Em um quarto de volta, as imagens de fundo e primeiro plano viram tiles bloqueados girados com o mapa. Meia volta ou um espelhamento as mantém como fundos. Espelhar vira os tokens para o lado espelhado sem espelhar a arte deles.",
+      "MirrorX": "Espelhar da esquerda para a direita",
+      "MirrorY": "Espelhar de cima para baixo"
+    },
+    "Grid": {
+      "Legend": "Tamanho da grade",
+      "Size": "Novo tamanho da grade",
+      "Units": "px",
+      "Hint": "O tamanho de um espaço da grade em pixels. O mapa e tudo nele crescem ou encolhem com a grade, então a cena mantém o mesmo número de espaços; por exemplo, 30 × 30 a 200 px vira 30 × 30 a 100 px."
+    },
+    "Stitch": {
+      "Legend": "Anexar outra cena",
+      "Scene": "Cena a anexar",
+      "Choose": "Escolha uma cena…",
+      "Side": "Lado",
+      "Align": "Alinhamento",
+      "Start": "Bordas de cima ou da esquerda",
+      "Center": "Centralizado",
+      "End": "Bordas de baixo ou da direita",
+      "Spacing": "Espaçamento",
+      "Gap": "Vão",
+      "Offset": "Deslocar ao longo do lado",
+      "SpacingHint": "Em espaços da grade. O vão deixa espaço vazio entre os dois mapas; o deslocamento move o mapa anexado ao longo do lado, com números negativos para cima ou para a esquerda.",
+      "Tokens": "Copiar os tokens dela",
+      "Hint": "Esta cena cresce para caber os dois mapas. O mapa, paredes, luzes, sons, notas, tiles, desenhos, regiões e, se marcado, os tokens da outra cena são copiados, escalados para o tamanho de grade desta cena. A outra cena não é alterada."
+    },
+    "Extract": {
+      "Legend": "Extrair uma área",
+      "Intro": "Cria uma nova cena a partir de parte desta, por exemplo um único prédio de um mapa de cidade. Esta cena não é alterada.",
+      "Area": "Área",
+      "Column": "Coluna",
+      "Row": "Linha",
+      "Width": "Largura",
+      "Height": "Altura",
+      "AreaHint": "Em espaços da grade, contados a partir do canto superior esquerdo. Ou escolha a área na pré-visualização abaixo.",
+      "Selection": "Área a extrair. As setas a movem; Shift e as setas a redimensionam.",
+      "DragHint": "Arraste no mapa para escolher uma área. Arraste a área para movê-la ou suas alças para redimensioná-la. As setas a movem; Shift e as setas a redimensionam.",
+      "Name": "Nome da nova cena",
+      "DefaultName": "{name} (Extrato)",
+      "Tokens": "Copiar tokens",
+      "Open": "Abrir a nova cena",
+      "Hint": "Tudo na área é copiado: as paredes são cortadas na borda, e as imagens de fundo e primeiro plano são recortadas para a área (veja a configuração do módulo \"Pasta para imagens recortadas\"). Todas as configurações da cena, como iluminação e grade, são mantidas.",
+      "Create": "Criar cena",
+      "Summary": "Copia: {list}",
+      "Empty": "Só o mapa está nesta área.",
+      "Images": "Imagens"
+    },
+    "Preview": {
+      "Legend": "Pré-visualização",
+      "Added": "Espaço adicionado",
+      "Removed": "Removido",
+      "Edge": "Nova borda da cena"
+    },
+    "Size": {
+      "Current": "Tamanho atual",
+      "New": "Novo tamanho",
+      "Value": "{width} × {height} px ({columns} × {rows} espaços da grade)"
+    },
+    "Options": {
+      "Legend": "Opções",
+      "Backup": "Manter uma cópia de segurança",
+      "BackupHint": "Salva primeiro uma cópia intacta da cena, oculta da barra de navegação.",
+      "ResetFog": "Redefinir a exploração da névoa",
+      "ResetFogHint": "Depois de uma transformação, as áreas exploradas não correspondem mais ao mapa."
+    },
+    "Apply": "Aplicar transformação",
+    "Confirm": {
+      "Title": "Transformar cena",
+      "Rotate": "Girar esta cena e tudo nela?",
+      "Pad": "Adicionar espaço em volta desta cena e mover tudo nela?",
+      "Unsaved": "Isto salva imediatamente. Alterações não salvas em outras abas desta janela serão perdidas.",
+      "NoBackup": "<strong>Nenhuma cópia de segurança será feita.</strong>",
+      "Grid": "Mudar o tamanho da grade desta cena e escalar tudo nela?",
+      "Mirror": "Espelhar esta cena e tudo nela?",
+      "Crop": "Alterar o espaço em volta desta cena e mover tudo nela?",
+      "Stitch": "Anexar uma cópia de \"{name}\" a esta cena?",
+      "Delete": "<strong>{count} objetos no espaço removido serão excluídos.</strong>",
+      "Restore": "Restaurar esta cena a partir de \"{name}\"? A cópia de segurança será excluída em seguida."
+    },
+    "Notify": {
+      "Success": "Cena \"{name}\" transformada.",
+      "Backup": "Cópia de segurança salva como \"{name}\".",
+      "Restored": "Cena \"{name}\" restaurada a partir da cópia de segurança.",
+      "Extracted": "Cena \"{name}\" criada."
+    },
+    "Backup": {
+      "Name": "{name} (Backup {time})"
+    },
+    "Tile": {
+      "background": "{level} Fundo",
+      "foreground": "{level} Primeiro plano"
+    },
+    "Warning": {
+      "FogOverlay": "Esta cena tem uma imagem de sobreposição de névoa sobre um mapa que não está esticado para preencher a cena. O mapa virou um tile, então a sobreposição não pode acompanhá-lo e pode não ficar mais alinhada.",
+      "UnknownShape": "Uma forma de região do tipo \"{type}\" não é suportada e foi deixada no lugar.",
+      "CropFailed": "A imagem de \"{name}\" não pôde ser recortada e foi mantida inteira.",
+      "PackageFolder": "A pasta \"{folder}\" pertence a um módulo ou sistema cujas atualizações apagariam as imagens. Elas foram salvas na pasta do mundo.",
+      "HexModes": "Cenas com grade hexagonal não podem ser giradas, espelhadas nem ter áreas extraídas."
+    },
+    "Error": {
+      "InvalidAngle": "Cenas só podem ser giradas em 90, 180 ou 270 graus.",
+      "HexRotation": "Cenas com grade hexagonal não podem ser giradas nem espelhadas.",
+      "InvalidPadding": "O espaço deve ser dado em espaços inteiros da grade.",
+      "NoPadding": "Informe quantos espaços adicionar ou remover em pelo menos um lado.",
+      "NotGM": "Só um mestre pode transformar cenas.",
+      "Failed": "Falha ao transformar a cena: {error}",
+      "InvalidGridSize": "O tamanho da grade deve ser um número inteiro de pixels, {min} ou mais.",
+      "SameGridSize": "Informe um tamanho de grade diferente do atual.",
+      "TooSmall": "A cena ficaria menor que um espaço da grade.",
+      "InvalidMirror": "Cenas só podem ser espelhadas da esquerda para a direita ou de cima para baixo.",
+      "StitchSame": "Escolha outra cena para anexar.",
+      "StitchSide": "Escolha o lado em que a cena será anexada.",
+      "StitchHex": "Cenas com grade hexagonal não podem ser anexadas nem receber outra cena.",
+      "StitchGap": "Vão e deslocamento devem ser espaços inteiros, e o vão 0 ou mais.",
+      "NoBackup": "Esta cena não tem cópia de segurança para restaurar.",
+      "Upload": "Não foi possível salvar a imagem.",
+      "RestoreFailed": "Falha ao restaurar a cena: {error}",
+      "ExtractHex": "Não é possível extrair áreas de cenas com grade hexagonal.",
+      "ExtractArea": "Escolha uma área de espaços inteiros dentro da cena.",
+      "ExtractFailed": "Falha ao criar a nova cena: {error}"
+    },
+    "Restore": {
+      "Legend": "Desfazer a última transformação",
+      "Label": "Cópia de segurança",
+      "Info": "\"{name}\" de {time}",
+      "Button": "Restaurar",
+      "Hint": "Volta esta cena ao estado anterior à última transformação que manteve uma cópia de segurança e depois exclui essa cópia. Tokens e outros objetos recebem seus IDs antigos de volta, e tudo o que foi adicionado desde então é removido."
+    },
+    "Settings": {
+      "ImageFolder": {
+        "Name": "Pasta para imagens recortadas",
+        "Hint": "Onde são salvas as imagens de fundo e primeiro plano recortadas ao remover espaço. Deixe vazio para usar a pasta do mundo (worlds/<world>/niks-scene-transformations), ou o mesmo bucket S3 se o mapa estiver lá. Pastas de módulos e sistemas não podem ser usadas, porque as atualizações apagariam os arquivos."
+      }
+    }
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "niks-scene-transformations": {
+    "Tab": {
+      "Label": "Transformovat",
+      "Intro": "Přidejte nebo odeberte prostor, otočte nebo zrcadlete scénu, změňte velikost mřížky, připojte jinou scénu nebo vyjměte oblast do nové scény. Žetony, zdi, dveře, světla, zvuky, dlaždice, kresby, poznámky a oblasti se posunou s ní, takže vše zůstane na svém místě na mapě. Změny se ukládají okamžitě."
+    },
+    "Mode": {
+      "Legend": "Transformace",
+      "Label": "Typ",
+      "Pad": "Přidat nebo odebrat prostor",
+      "Rotate": "Otočit nebo zrcadlit scénu",
+      "Grid": "Změnit velikost mřížky",
+      "Stitch": "Připojit jinou scénu",
+      "Extract": "Vyjmout oblast do nové scény"
+    },
+    "Pad": {
+      "Legend": "Přidat nebo odebrat prostor",
+      "Linked": "Stejně na všech stranách",
+      "Amount": "Políčka mřížky",
+      "Top": "Nahoře",
+      "Right": "Vpravo",
+      "Bottom": "Dole",
+      "Left": "Vlevo",
+      "Hint": "Kladná čísla přidají na straně tolik políček mřížky, záporná je odeberou. Na rozdíl od okraje Foundry mohou hráči do přidaného prostoru vstoupit. Obrázky pozadí a popředí se stanou uzamčenými dlaždicemi, takže mapa zůstane na místě."
+    },
+    "Crop": {
+      "RemoveOutside": "Smazat, co skončí venku",
+      "RemoveOutsideHint": "Smaže žetony, zdi, světla, zvuky, poznámky, dlaždice, kresby a oblasti, které leží celé v odebraném prostoru. Jinak zůstanou v tmavém okraji kolem scény.",
+      "OutsideCount": "Ke smazání: {count}.",
+      "Images": "Oříznout obrázky na novou velikost",
+      "ImagesHint": "Uloží viditelnou část obrázků pozadí a popředí jako nové soubory (viz nastavení modulu „Složka pro oříznuté obrázky“), aby se odebraná část nezobrazovala v okraji kolem scény."
+    },
+    "Rotate": {
+      "Legend": "Otočit nebo zrcadlit",
+      "Direction": "Otočení",
+      "Clockwise": "90° po směru hodinových ručiček",
+      "CounterClockwise": "90° proti směru hodinových ručiček",
+      "Half": "180°",
+      "Hint": "Při otočení o čtvrt se obrázky pozadí a popředí stanou uzamčenými dlaždicemi otočenými s mapou. Otočení o půl nebo zrcadlení je ponechá jako pozadí. Zrcadlení otočí žetony do zrcadleného směru, aniž by zrcadlilo jejich obrázek.",
+      "MirrorX": "Zrcadlit zleva doprava",
+      "MirrorY": "Zrcadlit shora dolů"
+    },
+    "Grid": {
+      "Legend": "Velikost mřížky",
+      "Size": "Nová velikost mřížky",
+      "Units": "px",
+      "Hint": "Velikost jednoho políčka mřížky v pixelech. Mapa a vše na ní se s mřížkou zvětší nebo zmenší, takže scéna si zachová stejný počet políček, např. 30 × 30 při 200 px se změní na 30 × 30 při 100 px."
+    },
+    "Stitch": {
+      "Legend": "Připojit jinou scénu",
+      "Scene": "Scéna k připojení",
+      "Choose": "Vyberte scénu…",
+      "Side": "Strana",
+      "Align": "Zarovnání",
+      "Start": "Horní nebo levé okraje",
+      "Center": "Na střed",
+      "End": "Dolní nebo pravé okraje",
+      "Spacing": "Rozestupy",
+      "Gap": "Mezera",
+      "Offset": "Posun podél strany",
+      "SpacingHint": "V políčkách mřížky. Mezera ponechá mezi mapami prázdný prostor; posun přesune připojenou mapu podél strany, záporná čísla nahoru nebo doleva.",
+      "Tokens": "Kopírovat její žetony",
+      "Hint": "Tato scéna se zvětší, aby se do ní vešly obě mapy. Mapa, zdi, světla, zvuky, poznámky, dlaždice, kresby, oblasti a — je-li zaškrtnuto — žetony druhé scény se zkopírují a přizpůsobí velikosti mřížky této scény. Druhá scéna se nezmění."
+    },
+    "Extract": {
+      "Legend": "Vyjmout oblast",
+      "Intro": "Vytvoří novou scénu z části této scény, například jednu budovu z mapy města. Tato scéna se nezmění.",
+      "Area": "Oblast",
+      "Column": "Sloupec",
+      "Row": "Řádek",
+      "Width": "Šířka",
+      "Height": "Výška",
+      "AreaHint": "V políčkách mřížky, počítáno od levého horního rohu. Nebo vyberte oblast v náhledu níže.",
+      "Selection": "Oblast k vyjmutí. Šipky ji posouvají, Shift a šipky mění její velikost.",
+      "DragHint": "Tažením po mapě vyberte oblast. Tažením oblasti ji posunete, tažením úchytů změníte velikost. Šipky ji posouvají, Shift a šipky mění její velikost.",
+      "Name": "Název nové scény",
+      "DefaultName": "{name} (výřez)",
+      "Tokens": "Kopírovat žetony",
+      "Open": "Otevřít novou scénu",
+      "Hint": "Zkopíruje se vše v oblasti: zdi se oříznou na okraji a obrázky pozadí a popředí se oříznou na oblast (viz nastavení modulu „Složka pro oříznuté obrázky“). Převezmou se všechna nastavení scény, například osvětlení a mřížka.",
+      "Create": "Vytvořit scénu",
+      "Summary": "Kopíruje: {list}",
+      "Empty": "V této oblasti je jen mapa.",
+      "Images": "Obrázky"
+    },
+    "Preview": {
+      "Legend": "Náhled",
+      "Added": "Přidaný prostor",
+      "Removed": "Odebráno",
+      "Edge": "Nový okraj scény"
+    },
+    "Size": {
+      "Current": "Aktuální velikost",
+      "New": "Nová velikost",
+      "Value": "{width} × {height} px ({columns} × {rows} políček mřížky)"
+    },
+    "Options": {
+      "Legend": "Možnosti",
+      "Backup": "Ponechat záložní kopii",
+      "BackupHint": "Nejprve uloží nezměněnou kopii scény, skrytou v navigační liště.",
+      "ResetFog": "Obnovit průzkum mlhy",
+      "ResetFogHint": "Po transformaci prozkoumané oblasti už neodpovídají mapě."
+    },
+    "Apply": "Použít transformaci",
+    "Confirm": {
+      "Title": "Transformovat scénu",
+      "Rotate": "Otočit tuto scénu a vše na ní?",
+      "Pad": "Přidat prostor kolem této scény a posunout vše na ní?",
+      "Unsaved": "Uloží se okamžitě. Neuložené změny v jiných kartách tohoto okna budou ztraceny.",
+      "NoBackup": "<strong>Nevytvoří se žádná záložní kopie.</strong>",
+      "Grid": "Změnit velikost mřížky této scény a přizpůsobit vše na ní?",
+      "Mirror": "Zrcadlit tuto scénu a vše na ní?",
+      "Crop": "Změnit prostor kolem této scény a posunout vše na ní?",
+      "Stitch": "Připojit k této scéně kopii „{name}“?",
+      "Delete": "<strong>Objekty v odebraném prostoru budou smazány (počet: {count}).</strong>",
+      "Restore": "Obnovit tuto scénu z „{name}“? Záložní kopie se poté smaže."
+    },
+    "Notify": {
+      "Success": "Scéna „{name}“ byla transformována.",
+      "Backup": "Záložní kopie uložena jako „{name}“.",
+      "Restored": "Scéna „{name}“ byla obnovena ze záložní kopie.",
+      "Extracted": "Scéna „{name}“ byla vytvořena."
+    },
+    "Backup": {
+      "Name": "{name} (záloha {time})"
+    },
+    "Tile": {
+      "background": "{level} Pozadí",
+      "foreground": "{level} Popředí"
+    },
+    "Warning": {
+      "FogOverlay": "Tato scéna má překryvný obrázek mlhy na mapě, která není roztažena přes celou scénu. Mapa se stala dlaždicí, takže ji překryv nemůže sledovat a nemusí už lícovat.",
+      "UnknownShape": "Tvar oblasti typu „{type}“ není podporován a byl ponechán na místě.",
+      "CropFailed": "Obrázek „{name}“ se nepodařilo oříznout, a proto zůstal celý.",
+      "PackageFolder": "Složka „{folder}“ patří modulu nebo systému, jehož aktualizace by obrázky smazaly. Byly proto uloženy do složky světa.",
+      "HexModes": "Scény s hexagonální mřížkou nelze otáčet, zrcadlit ani z nich vyjímat oblasti."
+    },
+    "Error": {
+      "InvalidAngle": "Scény lze otáčet jen o 90, 180 nebo 270 stupňů.",
+      "HexRotation": "Scény s hexagonální mřížkou nelze otáčet ani zrcadlit.",
+      "InvalidPadding": "Prostor je nutné zadat v celých políčkách mřížky.",
+      "NoPadding": "Zadejte alespoň pro jednu stranu, kolik políček mřížky přidat nebo odebrat.",
+      "NotGM": "Scény může transformovat jen PJ.",
+      "Failed": "Transformace scény se nezdařila: {error}",
+      "InvalidGridSize": "Velikost mřížky musí být celé číslo pixelů, alespoň {min}.",
+      "SameGridSize": "Zadejte jinou velikost mřížky, než je aktuální.",
+      "TooSmall": "Scéna by byla menší než jedno políčko mřížky.",
+      "InvalidMirror": "Scény lze zrcadlit jen zleva doprava nebo shora dolů.",
+      "StitchSame": "Vyberte jinou scénu k připojení.",
+      "StitchSide": "Vyberte stranu, ke které se má scéna připojit.",
+      "StitchHex": "Scény s hexagonální mřížkou nelze připojovat ani k nim nic připojit.",
+      "StitchGap": "Mezera a posun musí být celá políčka mřížky a mezera 0 nebo více.",
+      "NoBackup": "Tato scéna nemá žádnou záložní kopii k obnovení.",
+      "Upload": "Obrázek se nepodařilo uložit.",
+      "RestoreFailed": "Obnovení scény se nezdařilo: {error}",
+      "ExtractHex": "Ze scén s hexagonální mřížkou nelze vyjímat oblasti.",
+      "ExtractArea": "Vyberte oblast z celých políček mřížky uvnitř scény.",
+      "ExtractFailed": "Vytvoření nové scény se nezdařilo: {error}"
+    },
+    "Restore": {
+      "Legend": "Vrátit poslední transformaci",
+      "Label": "Záložní kopie",
+      "Info": "„{name}“ z {time}",
+      "Button": "Obnovit",
+      "Hint": "Vrátí tuto scénu do stavu před poslední transformací se záložní kopií a pak tuto kopii smaže. Žetony a další objekty dostanou zpět svá původní ID a vše, co bylo od té doby přidáno, se odstraní."
+    },
+    "Settings": {
+      "ImageFolder": {
+        "Name": "Složka pro oříznuté obrázky",
+        "Hint": "Kam se ukládají obrázky pozadí a popředí oříznuté odebráním prostoru. Ponechte prázdné pro složku světa (worlds/<world>/niks-scene-transformations), případně stejný bucket S3, pokud je mapa uložena tam. Složky modulů a systémů použít nelze, protože aktualizace by soubory smazaly."
+      }
+    }
+  }
+}

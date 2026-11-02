@@ -1,0 +1,174 @@
+{
+  "niks-scene-transformations": {
+    "Tab": {
+      "Label": "Trasforma",
+      "Intro": "Aggiungi o rimuovi spazio, ruota o specchia la scena, cambia la dimensione della griglia, collega un'altra scena o estrai un'area in una nuova scena. Token, muri, porte, luci, suoni, tessere, disegni, note e regioni si spostano insieme, così tutto resta al suo posto sulla mappa. Le modifiche vengono salvate subito."
+    },
+    "Mode": {
+      "Legend": "Trasformazione",
+      "Label": "Tipo",
+      "Pad": "Aggiungi o rimuovi spazio",
+      "Rotate": "Ruota o specchia la scena",
+      "Grid": "Cambia la dimensione della griglia",
+      "Stitch": "Collega un'altra scena",
+      "Extract": "Estrai un'area in una nuova scena"
+    },
+    "Pad": {
+      "Legend": "Aggiungi o rimuovi spazio",
+      "Linked": "Uguale su tutti i lati",
+      "Amount": "Caselle",
+      "Top": "Sopra",
+      "Right": "Destra",
+      "Bottom": "Sotto",
+      "Left": "Sinistra",
+      "Hint": "I numeri positivi aggiungono tante caselle su un lato, quelli negativi le rimuovono. A differenza del margine di Foundry, i giocatori possono muoversi nello spazio aggiunto. Le immagini di sfondo e primo piano diventano tessere bloccate, così la mappa resta dov'è."
+    },
+    "Crop": {
+      "RemoveOutside": "Elimina ciò che finisce fuori",
+      "RemoveOutsideHint": "Elimina token, muri, luci, suoni, note, tessere, disegni e regioni che si trovano interamente nello spazio rimosso. Altrimenti restano nel bordo scuro intorno alla scena.",
+      "OutsideCount": "Ne verrebbero eliminati {count}.",
+      "Images": "Ritaglia le immagini alla nuova dimensione",
+      "ImagesHint": "Salva la parte visibile delle immagini di sfondo e primo piano come nuovi file (vedi l'impostazione del modulo «Cartella per le immagini ritagliate»), così la parte rimossa non si vede nel bordo intorno alla scena."
+    },
+    "Rotate": {
+      "Legend": "Ruota o specchia",
+      "Direction": "Rotazione",
+      "Clockwise": "90° in senso orario",
+      "CounterClockwise": "90° in senso antiorario",
+      "Half": "180°",
+      "Hint": "Con un quarto di giro, le immagini di sfondo e primo piano diventano tessere bloccate ruotate con la mappa. Mezzo giro o una specchiatura le mantiene come sfondi. La specchiatura orienta i token nella direzione specchiata senza specchiarne l'immagine.",
+      "MirrorX": "Specchia da sinistra a destra",
+      "MirrorY": "Specchia dall'alto in basso"
+    },
+    "Grid": {
+      "Legend": "Dimensione della griglia",
+      "Size": "Nuova dimensione della griglia",
+      "Units": "px",
+      "Hint": "La dimensione di una casella in pixel. La mappa e tutto ciò che contiene si ingrandiscono o rimpiccioliscono con la griglia, così la scena mantiene lo stesso numero di caselle: ad esempio 30 × 30 a 200 px diventa 30 × 30 a 100 px."
+    },
+    "Stitch": {
+      "Legend": "Collega un'altra scena",
+      "Scene": "Scena da collegare",
+      "Choose": "Scegli una scena…",
+      "Side": "Lato",
+      "Align": "Allineamento",
+      "Start": "Bordi superiori o sinistri",
+      "Center": "Centrato",
+      "End": "Bordi inferiori o destri",
+      "Spacing": "Spaziatura",
+      "Gap": "Distanza",
+      "Offset": "Sposta lungo il lato",
+      "SpacingHint": "In caselle. La distanza lascia spazio vuoto tra le due mappe; lo spostamento muove la mappa collegata lungo il lato, i numeri negativi verso l'alto o a sinistra.",
+      "Tokens": "Copia i suoi token",
+      "Hint": "Questa scena si allarga per contenere entrambe le mappe. La mappa, i muri, le luci, i suoni, le note, le tessere, i disegni, le regioni e, se spuntato, i token dell'altra scena vengono copiati, scalati alla dimensione della griglia di questa scena. L'altra scena non viene modificata."
+    },
+    "Extract": {
+      "Legend": "Estrai un'area",
+      "Intro": "Crea una nuova scena da una parte di questa, ad esempio un singolo edificio da una mappa cittadina. Questa scena non viene modificata.",
+      "Area": "Area",
+      "Column": "Colonna",
+      "Row": "Riga",
+      "Width": "Larghezza",
+      "Height": "Altezza",
+      "AreaHint": "In caselle, contate dall'angolo in alto a sinistra. Oppure scegli l'area nell'anteprima qui sotto.",
+      "Selection": "Area da estrarre. Le frecce la spostano, Maiusc e frecce la ridimensionano.",
+      "DragHint": "Trascina sulla mappa per scegliere un'area. Trascina l'area per spostarla o le sue maniglie per ridimensionarla. Le frecce la spostano, Maiusc e frecce la ridimensionano.",
+      "Name": "Nome della nuova scena",
+      "DefaultName": "{name} (Estratto)",
+      "Tokens": "Copia i token",
+      "Open": "Apri la nuova scena",
+      "Hint": "Tutto ciò che è nell'area viene copiato: i muri vengono tagliati al bordo e le immagini di sfondo e primo piano ritagliate all'area (vedi l'impostazione del modulo «Cartella per le immagini ritagliate»). Tutte le impostazioni della scena, come illuminazione e griglia, vengono riprese.",
+      "Create": "Crea scena",
+      "Summary": "Copia: {list}",
+      "Empty": "In quest'area c'è solo la mappa.",
+      "Images": "Immagini"
+    },
+    "Preview": {
+      "Legend": "Anteprima",
+      "Added": "Spazio aggiunto",
+      "Removed": "Rimosso",
+      "Edge": "Nuovo bordo della scena"
+    },
+    "Size": {
+      "Current": "Dimensione attuale",
+      "New": "Nuova dimensione",
+      "Value": "{width} × {height} px ({columns} × {rows} caselle)"
+    },
+    "Options": {
+      "Legend": "Opzioni",
+      "Backup": "Conserva una copia di backup",
+      "BackupHint": "Salva prima una copia intatta della scena, nascosta dalla barra di navigazione.",
+      "ResetFog": "Reimposta l'esplorazione della nebbia",
+      "ResetFogHint": "Dopo una trasformazione le aree esplorate non corrispondono più alla mappa."
+    },
+    "Apply": "Applica trasformazione",
+    "Confirm": {
+      "Title": "Trasforma scena",
+      "Rotate": "Ruotare questa scena e tutto ciò che contiene?",
+      "Pad": "Aggiungere spazio intorno a questa scena e spostare tutto ciò che contiene?",
+      "Unsaved": "Il salvataggio è immediato. Le modifiche non salvate in altre schede di questa finestra andranno perse.",
+      "NoBackup": "<strong>Non verrà creata alcuna copia di backup.</strong>",
+      "Grid": "Cambiare la dimensione della griglia di questa scena e scalare tutto ciò che contiene?",
+      "Mirror": "Specchiare questa scena e tutto ciò che contiene?",
+      "Crop": "Modificare lo spazio intorno a questa scena e spostare tutto ciò che contiene?",
+      "Stitch": "Collegare una copia di «{name}» a questa scena?",
+      "Delete": "<strong>Verranno eliminati {count} elementi nello spazio rimosso.</strong>",
+      "Restore": "Ripristinare questa scena da «{name}»? La copia di backup verrà poi eliminata."
+    },
+    "Notify": {
+      "Success": "Scena «{name}» trasformata.",
+      "Backup": "Copia di backup salvata come «{name}».",
+      "Restored": "Scena «{name}» ripristinata dalla sua copia di backup.",
+      "Extracted": "Scena «{name}» creata."
+    },
+    "Backup": {
+      "Name": "{name} (Backup {time})"
+    },
+    "Tile": {
+      "background": "{level} Sfondo",
+      "foreground": "{level} Primo piano"
+    },
+    "Warning": {
+      "FogOverlay": "Questa scena ha un'immagine di sovrapposizione della nebbia su una mappa non estesa a tutta la scena. La mappa è diventata una tessera, quindi la sovrapposizione non può seguirla e potrebbe non essere più allineata.",
+      "UnknownShape": "Una forma di regione di tipo «{type}» non è supportata ed è stata lasciata al suo posto.",
+      "CropFailed": "Non è stato possibile ritagliare l'immagine di «{name}», che è stata mantenuta intera.",
+      "PackageFolder": "La cartella «{folder}» appartiene a un modulo o sistema i cui aggiornamenti eliminerebbero le immagini. Sono state salvate invece nella cartella del mondo.",
+      "HexModes": "Le scene con griglia esagonale non possono essere ruotate, specchiate né usate per estrarre aree."
+    },
+    "Error": {
+      "InvalidAngle": "Le scene possono essere ruotate solo di 90, 180 o 270 gradi.",
+      "HexRotation": "Le scene con griglia esagonale non possono essere ruotate né specchiate.",
+      "InvalidPadding": "Lo spazio deve essere indicato in caselle intere.",
+      "NoPadding": "Indica quante caselle aggiungere o rimuovere su almeno un lato.",
+      "NotGM": "Solo un GM può trasformare le scene.",
+      "Failed": "Trasformazione della scena non riuscita: {error}",
+      "InvalidGridSize": "La dimensione della griglia deve essere un numero intero di pixel, pari ad almeno {min}.",
+      "SameGridSize": "Inserisci una dimensione della griglia diversa da quella attuale.",
+      "TooSmall": "La scena sarebbe più piccola di una casella.",
+      "InvalidMirror": "Le scene possono essere specchiate solo da sinistra a destra o dall'alto in basso.",
+      "StitchSame": "Scegli un'altra scena da collegare.",
+      "StitchSide": "Scegli il lato a cui collegare la scena.",
+      "StitchHex": "Le scene con griglia esagonale non possono essere collegate né ricevere un'altra scena.",
+      "StitchGap": "Distanza e spostamento devono essere caselle intere, e la distanza 0 o più.",
+      "NoBackup": "Questa scena non ha una copia di backup da ripristinare.",
+      "Upload": "Non è stato possibile salvare l'immagine.",
+      "RestoreFailed": "Ripristino della scena non riuscito: {error}",
+      "ExtractHex": "Non è possibile estrarre aree da scene con griglia esagonale.",
+      "ExtractArea": "Scegli un'area di caselle intere all'interno della scena.",
+      "ExtractFailed": "Creazione della nuova scena non riuscita: {error}"
+    },
+    "Restore": {
+      "Legend": "Annulla l'ultima trasformazione",
+      "Label": "Copia di backup",
+      "Info": "«{name}» del {time}",
+      "Button": "Ripristina",
+      "Hint": "Riporta questa scena com'era prima dell'ultima trasformazione che ha conservato una copia di backup, poi elimina quella copia. I token e gli altri elementi riprendono i vecchi ID, e tutto ciò che è stato aggiunto nel frattempo viene rimosso."
+    },
+    "Settings": {
+      "ImageFolder": {
+        "Name": "Cartella per le immagini ritagliate",
+        "Hint": "Dove vengono salvate le immagini di sfondo e primo piano ritagliate rimuovendo spazio. Lascia vuoto per usare la cartella del mondo (worlds/<world>/niks-scene-transformations), oppure lo stesso bucket S3 se la mappa è lì. Le cartelle di moduli e sistemi non si possono usare, perché gli aggiornamenti eliminerebbero i file."
+      }
+    }
+  }
+}

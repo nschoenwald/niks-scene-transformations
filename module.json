@@ -11,7 +11,7 @@
   "url": "https://github.com/nschoenwald/niks-scene-transformations",
   "bugs": "https://github.com/nschoenwald/niks-scene-transformations/issues",
   "changelog": "https://github.com/nschoenwald/niks-scene-transformations/blob/main/CHANGELOG.md",
-  "version": "14.3.0",
+  "version": "14.4.0",
   "compatibility": {
     "minimum": "14",
     "verified": "14",
@@ -28,6 +28,46 @@
       "lang": "en",
       "name": "English",
       "path": "lang/en.json"
+    },
+    {
+      "lang": "de",
+      "name": "Deutsch",
+      "path": "lang/de.json"
+    },
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "lang/fr.json"
+    },
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "lang/es.json"
+    },
+    {
+      "lang": "it",
+      "name": "Italiano",
+      "path": "lang/it.json"
+    },
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "lang/pt-BR.json"
+    },
+    {
+      "lang": "ja",
+      "name": "日本語",
+      "path": "lang/ja.json"
+    },
+    {
+      "lang": "pl",
+      "name": "Polski",
+      "path": "lang/pl.json"
+    },
+    {
+      "lang": "cs",
+      "name": "Čeština",
+      "path": "lang/cs.json"
     }
   ],
   "socket": false,

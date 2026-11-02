@@ -1,0 +1,174 @@
+{
+  "niks-scene-transformations": {
+    "Tab": {
+      "Label": "Transformieren",
+      "Intro": "Raum hinzufügen oder entfernen, die Szene drehen oder spiegeln, ihre Rastergröße ändern, eine andere Szene anfügen oder einen Bereich in eine neue Szene auslagern. Token, Wände, Türen, Lichter, Klänge, Kacheln, Zeichnungen, Notizen und Regionen wandern mit, sodass alles an seinem Platz auf der Karte bleibt. Änderungen werden sofort gespeichert."
+    },
+    "Mode": {
+      "Legend": "Transformation",
+      "Label": "Art",
+      "Pad": "Raum hinzufügen oder entfernen",
+      "Rotate": "Szene drehen oder spiegeln",
+      "Grid": "Rastergröße ändern",
+      "Stitch": "Andere Szene anfügen",
+      "Extract": "Bereich in neue Szene auslagern"
+    },
+    "Pad": {
+      "Legend": "Raum hinzufügen oder entfernen",
+      "Linked": "Auf allen Seiten gleich",
+      "Amount": "Rasterfelder",
+      "Top": "Oben",
+      "Right": "Rechts",
+      "Bottom": "Unten",
+      "Left": "Links",
+      "Hint": "Positive Zahlen fügen auf einer Seite so viele Rasterfelder hinzu, negative entfernen sie. Anders als beim Rand von Foundry können Spieler in den hinzugefügten Raum ziehen. Hintergrund- und Vordergrundbilder werden zu gesperrten Kacheln, damit die Karte an ihrem Platz bleibt."
+    },
+    "Crop": {
+      "RemoveOutside": "Löschen, was außerhalb landet",
+      "RemoveOutsideHint": "Löscht Token, Wände, Lichter, Klänge, Notizen, Kacheln, Zeichnungen und Regionen, die vollständig im entfernten Raum liegen. Sonst bleiben sie im dunklen Rand um die Szene.",
+      "OutsideCount": "{count} würden gelöscht.",
+      "Images": "Bilder auf die neue Größe zuschneiden",
+      "ImagesHint": "Speichert den sichtbaren Teil der Hintergrund- und Vordergrundbilder als neue Dateien (siehe Moduleinstellung \"Ordner für zugeschnittene Bilder\"), damit der entfernte Teil nicht im Rand um die Szene zu sehen ist."
+    },
+    "Rotate": {
+      "Legend": "Drehen oder spiegeln",
+      "Direction": "Drehung",
+      "Clockwise": "90° im Uhrzeigersinn",
+      "CounterClockwise": "90° gegen den Uhrzeigersinn",
+      "Half": "180°",
+      "Hint": "Bei einer Vierteldrehung werden Hintergrund- und Vordergrundbilder zu gesperrten Kacheln, die mit der Karte gedreht werden. Eine halbe Drehung oder Spiegelung behält sie als Hintergründe. Beim Spiegeln werden Token in die gespiegelte Richtung gedreht, ohne ihr Bild zu spiegeln.",
+      "MirrorX": "Von links nach rechts spiegeln",
+      "MirrorY": "Von oben nach unten spiegeln"
+    },
+    "Grid": {
+      "Legend": "Rastergröße",
+      "Size": "Neue Rastergröße",
+      "Units": "px",
+      "Hint": "Die Größe eines Rasterfelds in Pixeln. Die Karte und alles darauf wachsen oder schrumpfen mit dem Raster, sodass die Szene gleich viele Rasterfelder behält, z. B. wird aus 30 × 30 bei 200 px 30 × 30 bei 100 px."
+    },
+    "Stitch": {
+      "Legend": "Andere Szene anfügen",
+      "Scene": "Anzufügende Szene",
+      "Choose": "Szene wählen…",
+      "Side": "Seite",
+      "Align": "Ausrichtung",
+      "Start": "Obere bzw. linke Kanten",
+      "Center": "Zentriert",
+      "End": "Untere bzw. rechte Kanten",
+      "Spacing": "Abstand",
+      "Gap": "Lücke",
+      "Offset": "Entlang der Seite verschieben",
+      "SpacingHint": "In Rasterfeldern. Die Lücke lässt leeren Raum zwischen den beiden Karten; die Verschiebung bewegt die angefügte Karte entlang der Seite, negative Zahlen nach oben bzw. links.",
+      "Tokens": "Ihre Token kopieren",
+      "Hint": "Diese Szene wächst, bis beide Karten passen. Karte, Wände, Lichter, Klänge, Notizen, Kacheln, Zeichnungen, Regionen und, falls angehakt, Token der anderen Szene werden hineinkopiert und auf die Rastergröße dieser Szene skaliert. Die andere Szene bleibt unverändert."
+    },
+    "Extract": {
+      "Legend": "Bereich auslagern",
+      "Intro": "Erstellt eine neue Szene aus einem Teil dieser Szene, z. B. ein einzelnes Gebäude aus einem Stadtplan. Diese Szene bleibt unverändert.",
+      "Area": "Bereich",
+      "Column": "Spalte",
+      "Row": "Zeile",
+      "Width": "Breite",
+      "Height": "Höhe",
+      "AreaHint": "In Rasterfeldern, gezählt ab der oberen linken Ecke. Oder wähle den Bereich unten in der Vorschau.",
+      "Selection": "Auszulagernder Bereich. Pfeiltasten verschieben ihn, Umschalt und Pfeiltasten ändern seine Größe.",
+      "DragHint": "Ziehe auf der Karte, um einen Bereich zu wählen. Ziehe den Bereich, um ihn zu verschieben, oder seine Griffe, um die Größe zu ändern. Pfeiltasten verschieben ihn, Umschalt und Pfeiltasten ändern seine Größe.",
+      "Name": "Name der neuen Szene",
+      "DefaultName": "{name} (Auszug)",
+      "Tokens": "Token kopieren",
+      "Open": "Neue Szene öffnen",
+      "Hint": "Alles im Bereich wird kopiert: Wände werden am Rand abgeschnitten, Hintergrund- und Vordergrundbilder auf den Bereich zugeschnitten (siehe Moduleinstellung \"Ordner für zugeschnittene Bilder\"). Alle Szeneneinstellungen wie Beleuchtung und Raster werden übernommen.",
+      "Create": "Szene erstellen",
+      "Summary": "Kopiert: {list}",
+      "Empty": "In diesem Bereich liegt nur die Karte.",
+      "Images": "Bilder"
+    },
+    "Preview": {
+      "Legend": "Vorschau",
+      "Added": "Hinzugefügter Raum",
+      "Removed": "Entfernt",
+      "Edge": "Neuer Szenenrand"
+    },
+    "Size": {
+      "Current": "Aktuelle Größe",
+      "New": "Neue Größe",
+      "Value": "{width} × {height} px ({columns} × {rows} Rasterfelder)"
+    },
+    "Options": {
+      "Legend": "Optionen",
+      "Backup": "Sicherungskopie behalten",
+      "BackupHint": "Speichert zuerst eine unveränderte Kopie der Szene, ausgeblendet aus der Navigationsleiste.",
+      "ResetFog": "Nebelerkundung zurücksetzen",
+      "ResetFogHint": "Erkundete Bereiche passen nach einer Transformation nicht mehr zur Karte."
+    },
+    "Apply": "Transformation anwenden",
+    "Confirm": {
+      "Title": "Szene transformieren",
+      "Rotate": "Diese Szene und alles darauf drehen?",
+      "Pad": "Raum um diese Szene hinzufügen und alles darauf verschieben?",
+      "Unsaved": "Dies wird sofort gespeichert. Ungespeicherte Änderungen in anderen Reitern dieses Fensters gehen verloren.",
+      "NoBackup": "<strong>Es wird keine Sicherungskopie erstellt.</strong>",
+      "Grid": "Rastergröße dieser Szene ändern und alles darauf skalieren?",
+      "Mirror": "Diese Szene und alles darauf spiegeln?",
+      "Crop": "Raum um diese Szene ändern und alles darauf verschieben?",
+      "Stitch": "Eine Kopie von \"{name}\" an diese Szene anfügen?",
+      "Delete": "<strong>{count} Objekte im entfernten Raum werden gelöscht.</strong>",
+      "Restore": "Diese Szene aus \"{name}\" wiederherstellen? Die Sicherungskopie wird danach gelöscht."
+    },
+    "Notify": {
+      "Success": "Szene \"{name}\" transformiert.",
+      "Backup": "Sicherungskopie als \"{name}\" gespeichert.",
+      "Restored": "Szene \"{name}\" aus ihrer Sicherungskopie wiederhergestellt.",
+      "Extracted": "Szene \"{name}\" erstellt."
+    },
+    "Backup": {
+      "Name": "{name} (Sicherung {time})"
+    },
+    "Tile": {
+      "background": "{level} Hintergrund",
+      "foreground": "{level} Vordergrund"
+    },
+    "Warning": {
+      "FogOverlay": "Diese Szene hat ein Nebel-Overlay-Bild auf einer Karte, die nicht auf die Szene gestreckt ist. Die Karte wurde zu einer Kachel, daher kann das Overlay ihr nicht folgen und passt eventuell nicht mehr.",
+      "UnknownShape": "Eine Regionsform vom Typ \"{type}\" wird nicht unterstützt und blieb an ihrem Platz.",
+      "CropFailed": "Das Bild von \"{name}\" konnte nicht zugeschnitten werden und blieb vollständig.",
+      "PackageFolder": "Der Ordner \"{folder}\" gehört zu einem Modul oder System, dessen Updates die Bilder löschen würden. Sie wurden stattdessen im Weltordner gespeichert.",
+      "HexModes": "Szenen mit Hexfeld-Raster können nicht gedreht, gespiegelt oder ausgelagert werden."
+    },
+    "Error": {
+      "InvalidAngle": "Szenen können nur um 90, 180 oder 270 Grad gedreht werden.",
+      "HexRotation": "Szenen mit Hexfeld-Raster können nicht gedreht oder gespiegelt werden.",
+      "InvalidPadding": "Raum muss in ganzen Rasterfeldern angegeben werden.",
+      "NoPadding": "Gib für mindestens eine Seite an, wie viele Rasterfelder hinzugefügt oder entfernt werden sollen.",
+      "NotGM": "Nur eine SL kann Szenen transformieren.",
+      "Failed": "Transformation der Szene fehlgeschlagen: {error}",
+      "InvalidGridSize": "Die Rastergröße muss eine ganze Zahl an Pixeln sein, mindestens {min}.",
+      "SameGridSize": "Gib eine andere Rastergröße als die aktuelle ein.",
+      "TooSmall": "Die Szene wäre kleiner als ein Rasterfeld.",
+      "InvalidMirror": "Szenen können nur von links nach rechts oder von oben nach unten gespiegelt werden.",
+      "StitchSame": "Wähle eine andere Szene zum Anfügen.",
+      "StitchSide": "Wähle die Seite, an die die Szene angefügt werden soll.",
+      "StitchHex": "Szenen mit Hexfeld-Raster können weder angefügt werden noch etwas angefügt bekommen.",
+      "StitchGap": "Lücke und Verschiebung müssen ganze Rasterfelder sein, die Lücke 0 oder mehr.",
+      "NoBackup": "Diese Szene hat keine Sicherungskopie zum Wiederherstellen.",
+      "Upload": "Das Bild konnte nicht gespeichert werden.",
+      "RestoreFailed": "Wiederherstellen der Szene fehlgeschlagen: {error}",
+      "ExtractHex": "Aus Szenen mit Hexfeld-Raster können keine Bereiche ausgelagert werden.",
+      "ExtractArea": "Wähle einen Bereich aus ganzen Rasterfeldern innerhalb der Szene.",
+      "ExtractFailed": "Erstellen der neuen Szene fehlgeschlagen: {error}"
+    },
+    "Restore": {
+      "Legend": "Letzte Transformation rückgängig machen",
+      "Label": "Sicherungskopie",
+      "Info": "\"{name}\" vom {time}",
+      "Button": "Wiederherstellen",
+      "Hint": "Setzt diese Szene auf den Stand vor der letzten Transformation mit Sicherungskopie zurück und löscht danach diese Kopie. Token und andere Objekte erhalten ihre alten IDs zurück, und alles seitdem Hinzugefügte wird entfernt."
+    },
+    "Settings": {
+      "ImageFolder": {
+        "Name": "Ordner für zugeschnittene Bilder",
+        "Hint": "Wohin Hintergrund- und Vordergrundbilder gespeichert werden, die durch Entfernen von Raum zugeschnitten wurden. Leer lassen, um den Weltordner (worlds/<world>/niks-scene-transformations) zu verwenden, oder denselben S3-Bucket, wenn die Karte dort liegt. Modul- und Systemordner sind nicht erlaubt, da Updates die Dateien löschen würden."
+      }
+    }
+  }
+}
