@@ -2,6 +2,10 @@
 
 All notable changes to **Nik's Scene Transformations (`niks-scene-transformations`)** are documented in this file.
 
+## [14.5.0] - 2026-11-22
+### Added
+- **French translation**: The module is now available in French, reviewed by Kameleau. Thank you!
+
 ## [14.4.1] - 2026-11-04
 ### Removed
 - Removed the French, Spanish, Italian, Brazilian Portuguese, Japanese, Polish and Czech translations. They were machine-translated and never checked by a native speaker. Players who use Foundry in one of these languages now see this module in English. Translations by native speakers are welcome as an issue or pull request.

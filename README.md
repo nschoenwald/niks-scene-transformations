@@ -96,7 +96,7 @@ The API is available on `game.modules.get("niks-scene-transformations").api` aft
 
 ## 🌐 Languages
 
-🇬🇧 English · 🇩🇪 Deutsch
+🇬🇧 English · 🇩🇪 Deutsch · 🇫🇷 Français (thanks Kameleau)
 
 Translations into other languages by native speakers are welcome as an issue or pull request.
 
