@@ -2,6 +2,7 @@
   "niks-scene-transformations": {
     "Tab": {
       "Label": "Transform",
+      "Misc": "Misc.",
       "Intro": "Add or remove space, rotate or mirror the scene, change its grid size, attach another scene or extract an area to a new scene. Tokens, walls, doors, lights, sounds, tiles, drawings, notes and regions move along, so everything stays where it belongs on the map. Changes are saved right away."
     },
     "Mode": {

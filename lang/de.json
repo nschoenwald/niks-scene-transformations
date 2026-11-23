@@ -2,6 +2,7 @@
   "niks-scene-transformations": {
     "Tab": {
       "Label": "Transformieren",
+      "Misc": "Versch.",
       "Intro": "Raum hinzufügen oder entfernen, die Szene drehen oder spiegeln, ihre Rastergröße ändern, eine andere Szene anfügen oder einen Bereich in eine neue Szene auslagern. Token, Wände, Türen, Lichter, Klänge, Kacheln, Zeichnungen, Notizen und Regionen wandern mit, sodass alles an seinem Platz auf der Karte bleibt. Änderungen werden sofort gespeichert."
     },
     "Mode": {

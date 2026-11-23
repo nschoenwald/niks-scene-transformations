@@ -33,7 +33,19 @@ export function registerSceneConfigTab() {
   SceneConfig.TABS.sheet.tabs.push({ id: TAB_ID, icon: 'fa-solid fa-arrows-rotate', label: `${MODULE_ID}.Tab.Label` });
   const position = SceneConfig.DEFAULT_OPTIONS.position;
   if ( !(position.width >= SHEET_WIDTH) ) position.width = SHEET_WIDTH;
+  Hooks.once('i18nInit', shortenMiscLabel);
   Hooks.on('renderSceneConfig', onRenderSceneConfig);
+}
+
+/**
+ * Use a shorter label for core's "Miscellaneous" tab, to leave room for the Transform tab. Only in languages that
+ * have the short label: the others keep core's translation instead of falling back to English.
+ */
+function shortenMiscLabel() {
+  const key = `${MODULE_ID}.Tab.Misc`;
+  if ( !game.i18n.has(key, false) ) return;
+  const misc = foundry.applications.sheets.SceneConfig.TABS.sheet.tabs.find(t => t.id === 'misc');
+  if ( misc ) misc.label = key;
 }
 
 /**

@@ -2,6 +2,13 @@
 
 All notable changes to **Nik's Scene Transformations (`niks-scene-transformations`)** are documented in this file.
 
+## [14.5.1] - 2026-11-23
+### Fixed
+- **Scene Configuration tabs**: Tab names are no longer cut off. If they don't fit in one row, for example with a larger font size or longer translations, they continue on a second row. This also works with Carolingian UI.
+
+### Changed
+- **Scene Configuration tabs**: "Miscellaneous" is now "Misc." in English and "Versch." in German, to save space.
+
 ## [14.5.0] - 2026-11-22
 ### Added
 - **French translation**: The module is now available in French, reviewed by Kameleau. Thank you!

@@ -184,18 +184,18 @@
 }
 
 /* Core lays the tabs out in one row that never wraps. The window is widened for the Transform tab
-   (scene-config-tab.js); if it still gets too narrow (UI scale, tabs from other modules), labels shrink with an
-   ellipsis instead of overflowing the window. */
+   (scene-config-tab.js); if the labels still don't fit (larger font size, longer translations, tabs from other
+   modules), they continue on a second row, so no label is ever cut off. */
 .scene-config nav.tabs.sheet-tabs {
+  flex: none;
+  flex-wrap: wrap;
+  gap: 0 var(--spacer-16);
   padding-inline: var(--spacer-8);
 }
 
 .scene-config nav.tabs.sheet-tabs > [data-tab] {
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
+  flex: none;
   white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 /* The scene form's Save button doesn't apply to this tab, which works with its own button */
