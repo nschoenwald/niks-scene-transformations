@@ -26,15 +26,42 @@ const SHEET_WIDTH = 680;
  * Add the tab and its template part to SceneConfig.
  */
 export function registerSceneConfigTab() {
-  const SceneConfig = foundry.applications.sheets.SceneConfig;
-  const part = { template: `modules/${MODULE_ID}/templates/scene-config-tab.hbs`, scrollable: [''] };
-  const { footer, ...parts } = SceneConfig.PARTS;
-  SceneConfig.PARTS = footer ? { ...parts, [TAB_ID]: part, footer } : { ...parts, [TAB_ID]: part };
-  SceneConfig.TABS.sheet.tabs.push({ id: TAB_ID, icon: 'fa-solid fa-arrows-rotate', label: `${MODULE_ID}.Tab.Label` });
-  const position = SceneConfig.DEFAULT_OPTIONS.position;
-  if ( !(position.width >= SHEET_WIDTH) ) position.width = SHEET_WIDTH;
+  addTab(foundry.applications.sheets.SceneConfig);
+  Hooks.once('setup', addTabToSceneSheets);
   Hooks.once('i18nInit', shortenMiscLabel);
   Hooks.on('renderSceneConfig', onRenderSceneConfig);
+}
+
+/**
+ * Add the tab to Scene sheets of systems and modules that subclass SceneConfig. Such a subclass can copy core's
+ * PARTS (or TABS, DEFAULT_OPTIONS) when its script loads, before this module's `init`, so the change to core's class
+ * doesn't reach it. Daggerheart's sheet, for example, copies PARTS but shares core's TABS: it showed the tab button
+ * with no content. Runs on `setup`, after every package has registered its sheets in `init`.
+ */
+function addTabToSceneSheets() {
+  const SceneConfig = foundry.applications.sheets.SceneConfig;
+  const sheets = Object.values(CONFIG.Scene.sheetClasses ?? {}).flatMap(byId => Object.values(byId));
+  for ( const { cls } of sheets ) {
+    if ( (cls !== SceneConfig) && (cls?.prototype instanceof SceneConfig) ) addTab(cls);
+  }
+}
+
+/**
+ * Add the tab's part, tab entry and window width to a SceneConfig class, where missing.
+ * @param {typeof foundry.applications.sheets.SceneConfig} cls
+ */
+function addTab(cls) {
+  if ( !(TAB_ID in cls.PARTS) ) {
+    const part = { template: `modules/${MODULE_ID}/templates/scene-config-tab.hbs`, scrollable: [''] };
+    const { footer, ...parts } = cls.PARTS;
+    cls.PARTS = footer ? { ...parts, [TAB_ID]: part, footer } : { ...parts, [TAB_ID]: part };
+  }
+  const tabs = cls.TABS?.sheet?.tabs;
+  if ( tabs && !tabs.some(t => t.id === TAB_ID) ) {
+    tabs.push({ id: TAB_ID, icon: 'fa-solid fa-arrows-rotate', label: `${MODULE_ID}.Tab.Label` });
+  }
+  const position = cls.DEFAULT_OPTIONS.position;
+  if ( position && !(position.width >= SHEET_WIDTH) ) position.width = SHEET_WIDTH;
 }
 
 /**

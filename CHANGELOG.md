@@ -2,6 +2,10 @@
 
 All notable changes to **Nik's Scene Transformations (`niks-scene-transformations`)** are documented in this file.
 
+## [14.5.2] - 2026-11-26
+### Fixed
+- **Other game systems**: The Transform tab now works in systems that bring their own Scene Configuration window, such as Daggerheart. Before, the tab was empty except for the save button.
+
 ## [14.5.1] - 2026-11-23
 ### Fixed
 - **Scene Configuration tabs**: Tab names are no longer cut off. If they don't fit in one row, for example with a larger font size or longer translations, they continue on a second row. This also works with Carolingian UI.

@@ -15,7 +15,7 @@ Rotate, mirror, crop or extend a scene, change its grid size, attach another sce
 
 ## ✨ Features
 
-- **Where to find it**: Open a scene's **Configure** window and switch to the **Transform** tab.
+- **Where to find it**: Open a scene's **Configure** window and switch to the **Transform** tab. This also works when a game system brings its own Scene Configuration window, such as Daggerheart.
 - **Add or remove space**:
   - Positive numbers add empty, playable space on a side, negative numbers cut grid spaces off it. Tick **Same on all sides** to set all four at once.
   - Unlike Foundry's own padding, players can move tokens, measure and draw in added space.
